@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"tipsy/ai"
 	"tipsy/game"
 )
 
@@ -19,5 +20,6 @@ func main() {
 	var game game.Game
 
 	json.Unmarshal(byteValue, &game)
-	fmt.Println(game)
+
+	fmt.Println(ai.GameState(game))
 }
