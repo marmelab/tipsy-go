@@ -1,22 +1,22 @@
 package tests
 
 import (
-	"testing"
-	"os"
-	"io/ioutil"
-	"tipsy/game"
-	"tipsy/ai"
 	"encoding/json"
+	"io/ioutil"
+	"os"
+	"testing"
+	"tipsy/ai"
+	"tipsy/game"
 )
 
 func TestRedShouldBeTheWinnerIfAllSixRedPucksAreFlipped(t *testing.T) {
 	//GIVEN
-	filePath:="./dataset/red-win.json"
+	filePath := "./dataset/red-win.json"
 	game := loadGame(filePath)
 	//WHEN
 	state := ai.GameState(game)
 	//THEN
-	if state != "red"{
+	if state != "red" {
 		t.Errorf("Winner shoul be red: %v => %v", filePath, state)
 	}
 }
@@ -24,12 +24,12 @@ func TestRedShouldBeTheWinnerIfAllSixRedPucksAreFlipped(t *testing.T) {
 func TestBlueShouldBeTheWinnerIfAllSixBluePucksAreFlipped(t *testing.T) {
 
 	//GIVEN
-	filePath:="./dataset/blue-win.json"
+	filePath := "./dataset/blue-win.json"
 	game := loadGame(filePath)
 	//WHEN
 	state := ai.GameState(game)
 	//THEN
-	if state != "blue"{
+	if state != "blue" {
 		t.Errorf("Winner should be blue: %v => %v", filePath, state)
 	}
 }
@@ -37,12 +37,12 @@ func TestBlueShouldBeTheWinnerIfAllSixBluePucksAreFlipped(t *testing.T) {
 func TestShouldBeActiveIfNeitherBlueOrRedHaveSixPucksFlipped(t *testing.T) {
 
 	//GIVEN
-	filePath:="./dataset/active.json"
+	filePath := "./dataset/active.json"
 	game := loadGame(filePath)
 	//WHEN
 	state := ai.GameState(game)
 	//THEN
-	if state != "active"{
+	if state != "active" {
 		t.Errorf("Game should be active: %v => %v", filePath, state)
 	}
 }
@@ -50,12 +50,12 @@ func TestShouldBeActiveIfNeitherBlueOrRedHaveSixPucksFlipped(t *testing.T) {
 func TestBlueShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 
 	//GIVEN
-	filePath:="./dataset/blue-win-blackpuck.json"
+	filePath := "./dataset/blue-win-blackpuck.json"
 	game := loadGame(filePath)
 	//WHEN
 	state := ai.GameState(game)
 	//THEN
-	if state != "blue"{
+	if state != "blue" {
 		t.Errorf("Blue should win as he pushed the black puck out: %v => %v", filePath, state)
 	}
 }
@@ -63,14 +63,14 @@ func TestBlueShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 func TestRedShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 
 	//GIVEN
-	filePath:="./dataset/red-win-blackpuck.json"
+	filePath := "./dataset/red-win-blackpuck.json"
 	game := loadGame(filePath)
 
 	//WHEN
 	state := ai.GameState(game)
 
 	//THEN
-	if state != "red"{
+	if state != "red" {
 		t.Errorf("Red should win as he pushed the black puck out: %v => %v", filePath, state)
 	}
 }
