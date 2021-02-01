@@ -1,0 +1,10 @@
+version: '3.3'
+
+services:
+  tipsy-go:
+    build: docker/go
+    volumes:
+      - ./src/tipsy:/go/src/tipsy
+      - ./test/tipsy:/go/test/tipsy
+    command: go run src/tipsy/main.go
+    working_dir: /go
