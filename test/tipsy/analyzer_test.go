@@ -74,6 +74,7 @@ func TestRedShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 		t.Errorf("Red should win as he pushed the black puck out: %v => %v", filePath, state)
 	}
 }
+
 func loadGame(filePath string) game.Game {
 	file, err := os.Open(filePath)
 	if err != nil {
