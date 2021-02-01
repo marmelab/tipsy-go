@@ -1,0 +1,15 @@
+sudo: required
+language: go
+
+services:
+    - docker
+
+go: "1.15.x"
+
+install: make install
+
+script: make test
+
+branches:
+  only:
+    - main

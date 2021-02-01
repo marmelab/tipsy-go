@@ -8,4 +8,4 @@ run:
 
 test:
 	echo "test"
-	docker-compose run --rm tipsy-go go test ./test/...
+	docker-compose run --rm tipsy-go go test ./test/tipsy
