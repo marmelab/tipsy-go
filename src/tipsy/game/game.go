@@ -6,13 +6,8 @@ const (
 )
 
 type Game struct {
-	ID          int
-	Pucks       []Puck
-	Players     [2]Player
-	Board       Board
-}
-
-func New() Game {
-	var game Game
-	return game
+	RedPucks      []Puck `json:"redPucks"`
+	BluePucks     []Puck `json:"bluePucks"`
+	BlackPuck     Puck   `json:"blackPuck"`
+	CurrentPlayer string `json:"currentPlayer"`
 }

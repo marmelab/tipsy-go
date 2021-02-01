@@ -1,15 +1,25 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"time"
+	"io/ioutil"
+	"os"
+	"tipsy/ai"
 	"tipsy/game"
 )
 
 func main() {
-	fmt.Println("Welcome to the playground!")
+	inputFilePath := os.Args[1]
+	file, err := os.Open(inputFilePath)
+	if err != nil {
+		panic(err)
+	}
+	byteValue, _ := ioutil.ReadAll(file)
 
-	fmt.Println("The time is", time.Now())
-	game := game.New()
-	fmt.Println(game)
+	var game game.Game
+
+	json.Unmarshal(byteValue, &game)
+
+	fmt.Println(ai.GameState(game))
 }
