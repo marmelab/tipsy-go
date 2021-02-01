@@ -9,6 +9,7 @@ type Game struct {
 	RedPucks  []Puck `json:"redPucks"`
 	BluePucks []Puck `json:"bluePucks"`
 	BlackPuck Puck   `json:"blackPuck"`
+	CurrentPlayer string `json:"currentPlayer"`
 }
 
 func New() Game {

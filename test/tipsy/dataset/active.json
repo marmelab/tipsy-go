@@ -1,8 +1,9 @@
 {
-    "redPucks":[
+    "currentPlayer": "blue",
+    "bluePucks":[
         {
 	        "position": [0,0],
-	        "flipped": true
+	        "flipped": false
         },
         {
 	        "position": [0,1],
@@ -26,7 +27,7 @@
 	        "flipped": true
         }
     ],
-    "bluePucks":[
+    "redPucks":[
         {
 	        "position": [0,0],
 	        "flipped": false
