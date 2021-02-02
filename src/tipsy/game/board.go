@@ -45,10 +45,10 @@ func initEdges(board *Board) {
 		var leftPosition = [2]int{node.Position[0] - 1, node.Position[1]}
 		var upPosition = [2]int{node.Position[0], node.Position[1] - 1}
 		var downPosition = [2]int{node.Position[0], node.Position[1] + 1}
-		addEdge(&node, leftPosition, "left", board)
-		addEdge(&node, rightPosition, "right", board)
-		addEdge(&node, upPosition, "up", board)
-		addEdge(&node, downPosition, "down", board)
+		addEdge(&node, leftPosition, "west", board)
+		addEdge(&node, rightPosition, "east", board)
+		addEdge(&node, upPosition, "north", board)
+		addEdge(&node, downPosition, "south", board)
 	}
 }
 
@@ -69,10 +69,20 @@ func GetNode(position [2]int, board *Board) Node {
 	return Node{}
 }
 
-// Contains return true if board contains a Vertex at a given position, and false otherwise.
+//GetNodeTo gets the node from a given one to a given direction
+func GetNodeTo(node *Node, board *Board, direction string) *Node {
+	for _, edge := range board.Edges {
+		if edge.From == node && edge.Value == direction {
+			return edge.To
+		}
+	}
+	return &Node{}
+}
+
+// Contains return true if board contains a Node at a given position, and false otherwise.
 func Contains(position [2]int, board Board) bool {
-	for _, vertex := range board.Vertices {
-		if vertex.Position[0] == position[0] && vertex.Position[1] == position[1] {
+	for _, Node := range board.Nodes {
+		if Node.Position[0] == position[0] && Node.Position[1] == position[1] {
 			return true
 		}
 	}

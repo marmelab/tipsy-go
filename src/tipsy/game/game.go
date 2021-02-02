@@ -49,3 +49,49 @@ func Deserialize(gameString []string) Game {
 	}
 	return game
 }
+
+func getNeighbor(puck Puck, board *Board, direction string) *Node {
+	puckNode := GetNode(puck.Position, board)
+	return GetNodeTo(&puckNode, board, direction)
+}
+
+func isAPuck(node *Node, game *Game) bool {
+	for _, puck := range game.Pucks {
+		fmt.Println(puck)
+	}
+	return true
+}
+func getPuck(node *Node, game *Game) *Puck {
+	for _, puck := range game.Pucks {
+		if puck.Position[0] == node.Position[0] && puck.Position[1] == node.Position[1] {
+			return &puck
+		}
+	}
+	panic("No Puck on this node")
+}
+
+func getNextFreeCell(puck *Puck, game *Game, board *Board, direction string) [2]int {
+	neighbor := getNeighbor(*puck, board, direction)
+	if isAPuck(neighbor, game) {
+		return puck.Position
+	}
+	return getNextFreeCell(getPuck(neighbor, game), game, board, direction)
+}
+
+func movePuckTo(puck *Puck, game *Game, board *Board, direction string) {
+	neighbor := getNeighbor(*puck, board, direction)
+	//if a puck, move it
+	if isAPuck(neighbor, game) {
+		movePuckTo(getPuck(neighbor, game), game, board, direction)
+	} else {
+		nextFreeCel := getNextFreeCell(puck, game, board, direction)
+		puck.Position = nextFreeCel
+	}
+}
+
+//Tilt the game in a given direction
+func Tilt(game *Game, board *Board, direction string) {
+	for _, puck := range game.Pucks {
+		movePuckTo(&puck, game, board, direction)
+	}
+}
