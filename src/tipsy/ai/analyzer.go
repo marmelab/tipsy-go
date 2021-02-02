@@ -4,7 +4,8 @@ import (
 	"tipsy/game"
 )
 
-func GameState(currentGame game.Game) string {
+//GetWinner return the winner of the game, or active if no winner yet
+func GetWinner(currentGame game.Game) string {
 
 	if (game.Puck{}) == currentGame.BlackPuck {
 		return currentGame.CurrentPlayer
@@ -27,10 +28,10 @@ func GameState(currentGame game.Game) string {
 		panic("Invalid pucks configuration, all pucks could not be flipped at the same time")
 	}
 	if flippedRedPuck == len(currentGame.RedPucks) {
-		return "red"
+		return game.RED
 	}
 	if flippedBluePuck == len(currentGame.BluePucks) {
-		return "blue"
+		return game.BLUE
 	}
 
 	return "active"
