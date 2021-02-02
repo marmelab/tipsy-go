@@ -21,5 +21,5 @@ func main() {
 
 	json.Unmarshal(byteValue, &game)
 
-	fmt.Println(ai.GameState(game))
+	fmt.Println(ai.GetWinner(game))
 }

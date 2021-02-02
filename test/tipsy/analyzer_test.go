@@ -14,7 +14,7 @@ func TestRedShouldBeTheWinnerIfAllSixRedPucksAreFlipped(t *testing.T) {
 	filePath := "./dataset/red-win.json"
 	game := loadGame(filePath)
 	//WHEN
-	state := ai.GameState(game)
+	state := ai.GetWinner(game)
 	//THEN
 	if state != "red" {
 		t.Errorf("Winner shoul be red: %v => %v", filePath, state)
@@ -27,7 +27,7 @@ func TestBlueShouldBeTheWinnerIfAllSixBluePucksAreFlipped(t *testing.T) {
 	filePath := "./dataset/blue-win.json"
 	game := loadGame(filePath)
 	//WHEN
-	state := ai.GameState(game)
+	state := ai.GetWinner(game)
 	//THEN
 	if state != "blue" {
 		t.Errorf("Winner should be blue: %v => %v", filePath, state)
@@ -40,7 +40,7 @@ func TestShouldBeActiveIfNeitherBlueOrRedHaveSixPucksFlipped(t *testing.T) {
 	filePath := "./dataset/active.json"
 	game := loadGame(filePath)
 	//WHEN
-	state := ai.GameState(game)
+	state := ai.GetWinner(game)
 	//THEN
 	if state != "active" {
 		t.Errorf("Game should be active: %v => %v", filePath, state)
@@ -53,7 +53,7 @@ func TestBlueShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 	filePath := "./dataset/blue-win-blackpuck.json"
 	game := loadGame(filePath)
 	//WHEN
-	state := ai.GameState(game)
+	state := ai.GetWinner(game)
 	//THEN
 	if state != "blue" {
 		t.Errorf("Blue should win as he pushed the black puck out: %v => %v", filePath, state)
@@ -67,7 +67,7 @@ func TestRedShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 	game := loadGame(filePath)
 
 	//WHEN
-	state := ai.GameState(game)
+	state := ai.GetWinner(game)
 
 	//THEN
 	if state != "red" {
