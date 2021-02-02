@@ -41,7 +41,7 @@ func TestGameShouldBeWellDesiaralized(t *testing.T) {
 	if !bluePuckExist {
 		t.Errorf("BluePuck should be on (0,0) %v", currentGame)
 	}
-	if bluePuck.Color != "blue" {
+	if bluePuck.Color != game.BLUE {
 		t.Errorf("BluePuck should be blue %v", currentGame)
 	}
 	if bluePuck.Flipped != false {
@@ -66,7 +66,7 @@ func TestThePuckShouldGoToRightWhenTiltedToEast(t *testing.T) {
 	currentGame = game.Tilt(currentGame, &board, "east")
 	//THEN
 	bluePuck, bluePuckExist := currentGame.Pucks["2:0"]
-	if !bluePuckExist || bluePuck.Color != "blue" {
+	if !bluePuckExist || bluePuck.Color != game.BLUE {
 		t.Errorf("BluePuck should be on (2,0) %v", currentGame)
 	}
 }
@@ -91,11 +91,11 @@ func TestThePuckShoulBeStoppedByAnotherPuck(t *testing.T) {
 
 	//THEN
 	bluePuck20, bluePuck20Exists := currentGame.Pucks["2:0"]
-	if !bluePuck20Exists || bluePuck20.Color != "blue" {
+	if !bluePuck20Exists || bluePuck20.Color != game.BLUE {
 		t.Errorf("Puck should be on (2,0) %v", currentGame)
 	}
 	bluePuck10, bluePuck10Exists := currentGame.Pucks["1:0"]
-	if !bluePuck10Exists || bluePuck10.Color != "blue" {
+	if !bluePuck10Exists || bluePuck10.Color != game.BLUE {
 		t.Errorf("Puck should be on (2,0) %v", currentGame)
 	}
 }
@@ -120,11 +120,11 @@ func TestBothPucksShouldMoveToTheSouthAndStoppedByTheWall(t *testing.T) {
 
 	//THEN
 	bluePuck34, bluePuck34Exists := currentGame.Pucks["3:4"]
-	if !bluePuck34Exists || bluePuck34.Color != "blue" {
+	if !bluePuck34Exists || bluePuck34.Color != game.BLUE {
 		t.Errorf("Puck should be on (3,4) %v", currentGame)
 	}
 	bluePuck35, bluePuck35Exists := currentGame.Pucks["3:5"]
-	if !bluePuck35Exists || bluePuck35.Color != "blue" {
+	if !bluePuck35Exists || bluePuck35.Color != game.BLUE {
 		t.Errorf("Puck should be on (3,5) %v", currentGame)
 	}
 }
@@ -149,15 +149,15 @@ func TestThreePucksShouldMoveToTheSouthAndStoppedByTheWall(t *testing.T) {
 
 	//THEN
 	bluePuck33, bluePuck33Exists := currentGame.Pucks["3:3"]
-	if !bluePuck33Exists || bluePuck33.Color != "blue" {
+	if !bluePuck33Exists || bluePuck33.Color != game.BLUE {
 		t.Errorf("Puck should be on (3,3) %v", currentGame)
 	}
 	bluePuck34, bluePuck34Exists := currentGame.Pucks["3:4"]
-	if !bluePuck34Exists || bluePuck34.Color != "blue" {
+	if !bluePuck34Exists || bluePuck34.Color != game.BLUE {
 		t.Errorf("Puck should be on (3,4) %v", currentGame)
 	}
 	bluePuck35, bluePuck35Exists := currentGame.Pucks["3:5"]
-	if !bluePuck35Exists || bluePuck35.Color != "blue" {
+	if !bluePuck35Exists || bluePuck35.Color != game.BLUE {
 		t.Errorf("Puck should be on (3,5) %v", currentGame)
 	}
 }
@@ -182,15 +182,15 @@ func TestStuckPucksShouldNotMove(t *testing.T) {
 
 	//THEN
 	bluePuck21, bluePuck21Exists := currentGame.Pucks["2:1"]
-	if !bluePuck21Exists || bluePuck21.Color != "blue" {
+	if !bluePuck21Exists || bluePuck21.Color != game.BLUE {
 		t.Errorf("Puck should be on (2,1) %v", currentGame)
 	}
 	bluePuck31, bluePuck31Exists := currentGame.Pucks["3:1"]
-	if !bluePuck31Exists || bluePuck31.Color != "blue" {
+	if !bluePuck31Exists || bluePuck31.Color != game.BLUE {
 		t.Errorf("Puck should be on (3,1) %v", currentGame)
 	}
 	bluePuck41, bluePuck41Exists := currentGame.Pucks["4:1"]
-	if !bluePuck41Exists || bluePuck41.Color != "blue" {
+	if !bluePuck41Exists || bluePuck41.Color != game.BLUE {
 		t.Errorf("Puck should be on (4,1) %v", currentGame)
 	}
 }
@@ -215,15 +215,15 @@ func TestSomePuckShouldMoveAndSomeShouldBeBlocked(t *testing.T) {
 
 	//THEN
 	bluePuck20, bluePuck20Exists := currentGame.Pucks["2:0"]
-	if !bluePuck20Exists || bluePuck20.Color != "blue" {
+	if !bluePuck20Exists || bluePuck20.Color != game.BLUE {
 		t.Errorf("Puck should be on (2,0) %v", currentGame)
 	}
 	bluePuck31, bluePuck31Exists := currentGame.Pucks["3:1"]
-	if !bluePuck31Exists || bluePuck31.Color != "blue" {
+	if !bluePuck31Exists || bluePuck31.Color != game.BLUE {
 		t.Errorf("Puck should be on (3,1) %v", currentGame)
 	}
 	bluePuck40, bluePuck40Exists := currentGame.Pucks["4:0"]
-	if !bluePuck40Exists || bluePuck40.Color != "blue" {
+	if !bluePuck40Exists || bluePuck40.Color != game.BLUE {
 		t.Errorf("Puck should be on (4,0) %v", currentGame)
 	}
 }

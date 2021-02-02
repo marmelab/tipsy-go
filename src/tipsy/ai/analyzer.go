@@ -4,6 +4,10 @@ import (
 	"tipsy/game"
 )
 
+const (
+	NUMBER_OF_PUCK = 6
+)
+
 //GetWinner return the winner of the game, or active if no winner yet
 func GetWinner(currentGame game.Game) string {
 
@@ -15,7 +19,7 @@ func GetWinner(currentGame game.Game) string {
 		if puck.Flipped == true && puck.Color == "red" {
 			flippedRedPuck++
 		}
-		if puck.Flipped == true && puck.Color == "blue" {
+		if puck.Flipped == true && puck.Color == game.BLUE {
 			flippedBluePuck++
 		}
 		if puck.Color == "black" {
@@ -25,13 +29,13 @@ func GetWinner(currentGame game.Game) string {
 	if blackPuck == 0 {
 		return currentGame.CurrentPlayer
 	}
-	if flippedRedPuck == 6 && flippedBluePuck == 6 {
+	if flippedRedPuck == NUMBER_OF_PUCK && flippedBluePuck == NUMBER_OF_PUCK {
 		panic("Invalid pucks configuration, all pucks could not be flipped at the same time")
 	}
-	if flippedRedPuck == 6 {
+	if flippedRedPuck == NUMBER_OF_PUCK {
 		return game.RED
 	}
-	if flippedBluePuck == 6 {
+	if flippedBluePuck == NUMBER_OF_PUCK {
 		return game.BLUE
 	}
 

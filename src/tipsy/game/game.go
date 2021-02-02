@@ -39,9 +39,9 @@ func Deserialize(gameString []string) Game {
 			case "R":
 				game.Pucks[strconv.Itoa(col-1)+":"+strconv.Itoa(line-2)] = Puck{Color: "red", Flipped: true}
 			case "b":
-				game.Pucks[strconv.Itoa(col-1)+":"+strconv.Itoa(line-2)] = Puck{Color: "blue"}
+				game.Pucks[strconv.Itoa(col-1)+":"+strconv.Itoa(line-2)] = Puck{Color: BLUE}
 			case "B":
-				game.Pucks[strconv.Itoa(col-1)+":"+strconv.Itoa(line-2)] = Puck{Color: "blue", Flipped: true}
+				game.Pucks[strconv.Itoa(col-1)+":"+strconv.Itoa(line-2)] = Puck{Color: BLUE, Flipped: true}
 			case "x":
 				game.Pucks[strconv.Itoa(col-1)+":"+strconv.Itoa(line-2)] = Puck{Color: "black"}
 			}

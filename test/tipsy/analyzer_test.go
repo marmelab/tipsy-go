@@ -43,12 +43,12 @@ func TestBlueShouldBeTheWinnerIfAllSixBluePucksAreFlipped(t *testing.T) {
 		"#| |#|B| |B|#| |#",
 		"#| | | |#| | | |#",
 		"#################"}
-	game := game.Deserialize(rawGame)
+	currentGame := game.Deserialize(rawGame)
 	//WHEN
-	state := ai.GetWinner(game)
+	state := ai.GetWinner(currentGame)
 	//THEN
-	if state != "blue" {
-		t.Errorf("Winner should be blue: %v => %v", game, state)
+	if state != game.BLUE {
+		t.Errorf("Winner should be blue: %v => %v", currentGame, state)
 	}
 }
 
@@ -77,7 +77,7 @@ func TestShouldBeActiveIfNeitherBlueOrRedHaveSixPucksFlipped(t *testing.T) {
 func TestBlueShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 
 	//GIVEN
-	rawGame := []string{"blue",
+	rawGame := []string{game.BLUE,
 		"#################",
 		"#| | | |#| | | |#",
 		"#| |#|b| |b|#| | ",
@@ -87,12 +87,12 @@ func TestBlueShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 		"#| |#|b| |b|#| |#",
 		"#| | | |#| | | |#",
 		"#################"}
-	game := game.Deserialize(rawGame)
+	currentGame := game.Deserialize(rawGame)
 	//WHEN
-	state := ai.GetWinner(game)
+	state := ai.GetWinner(currentGame)
 	//THEN
-	if state != "blue" {
-		t.Errorf("Blue should win as he pushed the black puck out: %v => %v", game, state)
+	if state != game.BLUE {
+		t.Errorf("Blue should win as he pushed the black puck out: %v => %v", currentGame, state)
 	}
 }
 
