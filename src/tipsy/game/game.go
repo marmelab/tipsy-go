@@ -29,20 +29,18 @@ func Deserialize(gameString []string) Game {
 		}
 		characters := strings.Split(gameString[line], "|")
 		fmt.Println(characters)
+
 		for col, char := range characters {
-			if char == "r" {
+			switch char {
+			case "r":
 				game.Pucks = append(game.Pucks, Puck{Position: [2]int{col - 1, line - 2}, Color: "red"})
-			}
-			if char == "R" {
+			case "R":
 				game.Pucks = append(game.Pucks, Puck{Position: [2]int{col - 1, line - 2}, Color: "red", Flipped: true})
-			}
-			if char == "b" {
+			case "b":
 				game.Pucks = append(game.Pucks, Puck{Position: [2]int{col - 1, line - 2}, Color: "blue"})
-			}
-			if char == "B" {
+			case "B":
 				game.Pucks = append(game.Pucks, Puck{Position: [2]int{col - 1, line - 2}, Color: "blue", Flipped: true})
-			}
-			if char == "x" {
+			case "x":
 				game.Pucks = append(game.Pucks, Puck{Position: [2]int{col - 1, line - 2}, Color: "black"})
 			}
 		}
