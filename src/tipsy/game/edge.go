@@ -1,8 +1,8 @@
 package game
 
-//Edge an edge between two Vertex
+//Edge an edge between two Node
 type Edge struct {
-	From  *Vertex
-	To    *Vertex
+	From  *Node
+	To    *Node
 	Value string
 }

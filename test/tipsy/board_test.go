@@ -55,8 +55,8 @@ func TestExitShouldHaveExitAttribute(t *testing.T) {
 	var board = game.NewBoard()
 
 	for _, exit := range exits {
-		for _, vertex := range board.Vertices {
-			if (vertex.Position[0] == exit[0]) && (vertex.Position[1] == exit[1]) && vertex.Exit != true {
+		for _, Node := range board.Nodes {
+			if (Node.Position[0] == exit[0]) && (Node.Position[1] == exit[1]) && Node.Exit != true {
 				t.Errorf("Exit should have exit attribute to true %v", exit)
 			}
 		}
