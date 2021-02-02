@@ -1,5 +1,6 @@
 package game
 
 type Vertex struct {
-	ID string
+	Position [2]int
+	Value    string
 }
