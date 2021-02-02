@@ -50,48 +50,58 @@ func Deserialize(gameString []string) Game {
 	return game
 }
 
-func getNeighbor(puck Puck, board *Board, direction string) *Node {
-	puckNode := GetNode(puck.Position, board)
-	return GetNodeTo(&puckNode, board, direction)
+func getNeighbor(position [2]int, board *Board, direction string) Node {
+	puckNode := GetNode(position, board)
+	return GetNodeTo(puckNode, board, direction)
 }
 
-func isAPuck(node *Node, game *Game) bool {
+func isAPuck(node Node, game Game) bool {
 	for _, puck := range game.Pucks {
-		fmt.Println(puck)
+		if puck.Position == node.Position {
+			return true
+		}
 	}
-	return true
+	return false
 }
-func getPuck(node *Node, game *Game) *Puck {
+func getPuck(node Node, game Game) Puck {
 	for _, puck := range game.Pucks {
-		if puck.Position[0] == node.Position[0] && puck.Position[1] == node.Position[1] {
-			return &puck
+		if puck.Position == node.Position {
+			return puck
 		}
 	}
 	panic("No Puck on this node")
 }
-
-func getNextFreeCell(puck *Puck, game *Game, board *Board, direction string) [2]int {
-	neighbor := getNeighbor(*puck, board, direction)
-	if isAPuck(neighbor, game) {
-		return puck.Position
-	}
-	return getNextFreeCell(getPuck(neighbor, game), game, board, direction)
+func isAWall(node Node, board *Board) bool {
+	return (Node{}) == GetNode(node.Position, board)
 }
 
-func movePuckTo(puck *Puck, game *Game, board *Board, direction string) {
-	neighbor := getNeighbor(*puck, board, direction)
-	//if a puck, move it
-	if isAPuck(neighbor, game) {
-		movePuckTo(getPuck(neighbor, game), game, board, direction)
-	} else {
-		nextFreeCel := getNextFreeCell(puck, game, board, direction)
-		puck.Position = nextFreeCel
+func getNextFreeCell(position [2]int, game Game, board *Board, direction string) [2]int {
+	neighbor := getNeighbor(position, board, direction)
+	if isAPuck(neighbor, game) || isAWall(neighbor, board) {
+		return position
 	}
+	return getNextFreeCell(neighbor.Position, game, board, direction)
+}
+
+func movePuckTo(puck Puck, game Game, board *Board, direction string) []Puck {
+	neighbor := getNeighbor(puck.Position, board, direction)
+	var pucks []Puck
+	if isAPuck(neighbor, game) {
+		pucks = append(pucks, movePuckTo(getPuck(neighbor, game), game, board, direction)...)
+	}
+	nextFreeCell := getNextFreeCell(puck.Position, game, board, direction)
+	puck.Position = nextFreeCell
+	pucks = append(pucks, puck)
+	return pucks
+
 }
 
 //Tilt the game in a given direction
-func Tilt(game *Game, board *Board, direction string) {
+func Tilt(game Game, board *Board, direction string) Game {
+	var pucks []Puck
 	for _, puck := range game.Pucks {
-		movePuckTo(&puck, game, board, direction)
+		pucks = append(pucks, movePuckTo(puck, game, board, direction)...)
 	}
+	game.Pucks = pucks
+	return game
 }

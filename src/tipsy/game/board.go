@@ -40,47 +40,47 @@ func initNodes(board *Board) {
 }
 
 func initEdges(board *Board) {
-	for _, node := range (*board).Nodes {
+	for _, node := range board.Nodes {
 		var rightPosition = [2]int{node.Position[0] + 1, node.Position[1]}
 		var leftPosition = [2]int{node.Position[0] - 1, node.Position[1]}
 		var upPosition = [2]int{node.Position[0], node.Position[1] - 1}
 		var downPosition = [2]int{node.Position[0], node.Position[1] + 1}
-		addEdge(&node, leftPosition, "west", board)
-		addEdge(&node, rightPosition, "east", board)
-		addEdge(&node, upPosition, "north", board)
-		addEdge(&node, downPosition, "south", board)
+		addEdge(node, leftPosition, "west", board)
+		addEdge(node, rightPosition, "east", board)
+		addEdge(node, upPosition, "north", board)
+		addEdge(node, downPosition, "south", board)
 	}
 }
 
-func addEdge(from *Node, to [2]int, value string, board *Board) {
-	if Contains(to, (*board)) {
+func addEdge(from Node, to [2]int, value string, board *Board) {
+	if Contains(to, board) {
 		var to = GetNode(to, board)
-		(*board).Edges = append((*board).Edges, Edge{From: from, To: &to, Value: value})
+		(*board).Edges = append(board.Edges, Edge{From: from, To: to, Value: value})
 	}
 }
 
 //GetNode gets the node given a position
 func GetNode(position [2]int, board *Board) Node {
-	for _, Node := range board.Nodes {
-		if Node.Position[0] == position[0] && Node.Position[1] == position[1] {
-			return Node
+	for _, node := range board.Nodes {
+		if node.Position[0] == position[0] && node.Position[1] == position[1] {
+			return node
 		}
 	}
 	return Node{}
 }
 
 //GetNodeTo gets the node from a given one to a given direction
-func GetNodeTo(node *Node, board *Board, direction string) *Node {
+func GetNodeTo(node Node, board *Board, direction string) Node {
 	for _, edge := range board.Edges {
 		if edge.From == node && edge.Value == direction {
 			return edge.To
 		}
 	}
-	return &Node{}
+	return Node{}
 }
 
 // Contains return true if board contains a Node at a given position, and false otherwise.
-func Contains(position [2]int, board Board) bool {
+func Contains(position [2]int, board *Board) bool {
 	for _, Node := range board.Nodes {
 		if Node.Position[0] == position[0] && Node.Position[1] == position[1] {
 			return true
