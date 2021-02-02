@@ -16,9 +16,7 @@ const (
 
 //Game the game state
 type Game struct {
-	RedPucks      []Puck `json:"redPucks"`
-	BluePucks     []Puck `json:"bluePucks"`
-	BlackPuck     Puck   `json:"blackPuck"`
+	Pucks         []Puck `json:"pucks"`
 	CurrentPlayer string `json:"currentPlayer"`
 }
 
@@ -33,19 +31,19 @@ func Deserialize(gameString []string) Game {
 		fmt.Println(characters)
 		for col, char := range characters {
 			if char == "r" {
-				game.RedPucks = append(game.RedPucks, Puck{Position: [2]int{col - 1, line - 2}})
+				game.Pucks = append(game.Pucks, Puck{Position: [2]int{col - 1, line - 2}, Color: "red"})
 			}
 			if char == "R" {
-				game.RedPucks = append(game.RedPucks, Puck{Position: [2]int{col - 1, line - 2}, Flipped: true})
+				game.Pucks = append(game.Pucks, Puck{Position: [2]int{col - 1, line - 2}, Color: "red", Flipped: true})
 			}
 			if char == "b" {
-				game.BluePucks = append(game.BluePucks, Puck{Position: [2]int{col - 1, line - 2}})
+				game.Pucks = append(game.Pucks, Puck{Position: [2]int{col - 1, line - 2}, Color: "blue"})
 			}
 			if char == "B" {
-				game.BluePucks = append(game.BluePucks, Puck{Position: [2]int{col - 1, line - 2}, Flipped: true})
+				game.Pucks = append(game.Pucks, Puck{Position: [2]int{col - 1, line - 2}, Color: "blue", Flipped: true})
 			}
 			if char == "x" {
-				game.BlackPuck = Puck{Position: [2]int{col - 1, line - 2}}
+				game.Pucks = append(game.Pucks, Puck{Position: [2]int{col - 1, line - 2}, Color: "black"})
 			}
 		}
 	}

@@ -1,55 +1,66 @@
 {
     "currentPlayer": "blue",
-    "bluePucks": [{
+    "pucks": [{
             "position": [0, 0],
-            "flipped": false
+            "flipped": false,
+            "color": "blue"
         },
         {
             "position": [0, 1],
-            "flipped": true
+            "flipped": true,
+            "color": "blue"
         },
 
         {
             "position": [0, 2],
-            "flipped": true
+            "flipped": true,
+            "color": "blue"
         },
         {
             "position": [0, 3],
-            "flipped": true
+            "flipped": true,
+            "color": "blue"
         },
         {
             "position": [0, 4],
-            "flipped": true
+            "flipped": true,
+            "color": "blue"
         },
         {
             "position": [0, 5],
-            "flipped": true
-        }
-    ],
-    "redPucks": [{
+            "flipped": true,
+            "color": "blue"
+        },
+        {
             "position": [0, 0],
-            "flipped": false
+            "flipped": false,
+            "color": "red"
         },
         {
             "position": [0, 1],
-            "flipped": false
+            "flipped": false,
+            "color": "red"
         },
 
         {
             "position": [0, 2],
-            "flipped": false
+            "flipped": false,
+            "color": "red"
         },
         {
             "position": [0, 3],
-            "flipped": false
+            "flipped": false,
+            "color": "red"
         },
         {
             "position": [0, 4],
-            "flipped": false
+            "flipped": false,
+            "color": "red"
         },
         {
             "position": [0, 5],
-            "flipped": false
+            "flipped": false,
+            "color": "red"
         }
     ]
 }
