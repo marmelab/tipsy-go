@@ -69,7 +69,7 @@ func TestShouldBeActiveIfNeitherBlueOrRedHaveSixPucksFlipped(t *testing.T) {
 	//WHEN
 	state := ai.GetScore(game, "blue")
 	//THEN
-	if state != ai.ActiveScore {
+	if state != ai.NeutralScore {
 		t.Errorf("Game should be active: %v => %v", rawGame, state)
 	}
 }
@@ -237,7 +237,7 @@ func TestMoveToEastShouldBePartOfTheWinsWhenLastBlueNearExit(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	moves := ai.GetNextMovesScores(game, "blue")
+	moves := ai.GetNextMovesScores(game, "blue", true)
 
 	//THEN
 	if len(moves) != 3 {
@@ -268,7 +268,7 @@ func TestMoveToEastShouldBePartOfTheLoseWhenLastBlueNearExit(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	moves := ai.GetNextMovesScores(game, "red")
+	moves := ai.GetNextMovesScores(game, "red", true)
 
 	//THEN
 	if len(moves) != 3 {
@@ -299,7 +299,7 @@ func TestMoveToUpRightShouldBePartOfTheWinsWhenLastBlueIsOneCellNearExit(t *test
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	moves := ai.GetNextMovesScores(game, "blue")
+	moves := ai.GetNextMovesScores(game, "blue", true)
 
 	//THEN
 	upRightWin := moves["up:right"]
