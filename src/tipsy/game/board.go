@@ -5,7 +5,8 @@ import (
 )
 
 const (
-	BOARD_SIZE = 7
+	//BoardSize the size of the board
+	BoardSize = 7
 )
 
 //Board : the board of tipsy game
@@ -49,10 +50,10 @@ func initEdges(board *Board) {
 		var leftPosition = [2]int{node.Position[0] - 1, node.Position[1]}
 		var upPosition = [2]int{node.Position[0], node.Position[1] - 1}
 		var downPosition = [2]int{node.Position[0], node.Position[1] + 1}
-		addEdge(node, leftPosition, "west", board)
-		addEdge(node, rightPosition, "east", board)
-		addEdge(node, upPosition, "north", board)
-		addEdge(node, downPosition, "south", board)
+		addEdge(node, leftPosition, "left", board)
+		addEdge(node, rightPosition, "right", board)
+		addEdge(node, upPosition, "up", board)
+		addEdge(node, downPosition, "down", board)
 	}
 }
 
@@ -157,7 +158,11 @@ func movePuckTo(puckKey string, currentPuck Puck,
 		}
 	}
 	nextFreeCell := getNextFreeCell(tools.GetPositionFromKey(puckKey), gamePucks, board, direction)
-	pucks[tools.GetKeyFromPosition(nextFreeCell)] = currentPuck
+	if isExit(nextFreeCell, board) {
+		fallenPucks = append(fallenPucks, currentPuck)
+	} else {
+		pucks[tools.GetKeyFromPosition(nextFreeCell)] = currentPuck
+	}
 	return pucks, fallenPucks
 
 }

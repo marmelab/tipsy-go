@@ -1,51 +1,103 @@
 package ai
 
 import (
+	"fmt"
 	"tipsy/game"
 )
 
 const (
-	NUMBER_OF_PUCK = 6
+	//NumberOfPuck The number of each red and blue pucks
+	NumberOfPuck = 6
+	ActiveScore  = 0
+	WinningScore = 100
+	LosingScore  = -100
 )
 
-//GetWinner return the winner of the game, or active if no winner yet
-func GetWinner(currentGame game.Game) string {
+//GetNextMovesScores evaluate each move to find which win or not
+func GetNextMovesScores(currentGame game.Game, askingPlayer string, verbose bool) map[string]int {
+	directions := [4]string{"right", "left", "up", "down"}
+	moves := make(map[string]int)
+	board := game.NewBoard()
+	for _, firstDirection := range directions {
+		if verbose {
+			fmt.Printf("%v", firstDirection)
+		}
+		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
+		score := GetScore(firstMoveGame, askingPlayer)
+		if score == ActiveScore {
+			if verbose {
+				fmt.Println()
+			}
+			for _, secondDirection := range directions {
+				if verbose {
+					fmt.Printf("|-- %v", secondDirection)
+				}
+				secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
+				score := GetScore(secondMoveGame, askingPlayer)
+				if score != ActiveScore {
+					if verbose {
+						fmt.Printf(" => %v", score)
+					}
+					moves[firstDirection+":"+secondDirection] = score
+				}
+				if verbose {
+					fmt.Println()
+				}
+			}
+		} else {
+			if verbose {
+				fmt.Printf(" => %v\n", score)
+			}
+			moves[firstDirection] = score
+		}
+	}
+	return moves
+}
+
+//GetScore return the winner of the game, or active if no winner yet
+func GetScore(currentGame game.Game, playerAsking string) int {
 
 	fallenRedPucks, fallenBluePucks, fallenBlackPuck := getFallenPucks(currentGame)
 	flippedRedPuck, flippedBluePuck := getFlippedPucks(currentGame)
 
 	if fallenBlackPuck {
-		return currentGame.CurrentPlayer
+		return getAskingPlayerScore(currentGame.CurrentPlayer, playerAsking)
 	}
-	if flippedRedPuck == NUMBER_OF_PUCK && flippedBluePuck == NUMBER_OF_PUCK {
+	if flippedRedPuck == NumberOfPuck && flippedBluePuck == NumberOfPuck {
 		panic("Invalid pucks configuration, all pucks could not be flipped at the same time")
 	}
-	if flippedRedPuck == NUMBER_OF_PUCK {
-		return game.RED
+	if flippedRedPuck == NumberOfPuck {
+		return getAskingPlayerScore(game.RED, playerAsking)
 	}
-	if flippedBluePuck == NUMBER_OF_PUCK {
-		return game.BLUE
+	if flippedBluePuck == NumberOfPuck {
+		return getAskingPlayerScore(game.BLUE, playerAsking)
 	}
 	if currentGame.CurrentPlayer == game.BLUE {
-		if flippedRedPuck+fallenRedPucks == NUMBER_OF_PUCK {
-			return game.RED
+		if flippedRedPuck+fallenRedPucks == NumberOfPuck {
+			return getAskingPlayerScore(game.RED, playerAsking)
 		}
-		if flippedBluePuck+fallenBluePucks == NUMBER_OF_PUCK {
-			return game.BLUE
+		if flippedBluePuck+fallenBluePucks == NumberOfPuck {
+			return getAskingPlayerScore(game.BLUE, playerAsking)
 		}
 	}
 	if currentGame.CurrentPlayer == game.RED {
-		if flippedBluePuck+fallenBluePucks == NUMBER_OF_PUCK {
-			return game.BLUE
+		if flippedBluePuck+fallenBluePucks == NumberOfPuck {
+			return getAskingPlayerScore(game.BLUE, playerAsking)
 		}
-		if flippedRedPuck+fallenRedPucks == NUMBER_OF_PUCK {
-			return game.RED
+		if flippedRedPuck+fallenRedPucks == NumberOfPuck {
+			return getAskingPlayerScore(game.RED, playerAsking)
 		}
 	}
 
-	return "active"
+	return ActiveScore
 }
 
+func getAskingPlayerScore(winningPlayer string, askingPlayer string) int {
+	if winningPlayer == askingPlayer {
+		return WinningScore
+	}
+	return LosingScore
+}
 func getFallenPucks(currentGame game.Game) (int, int, bool) {
 
 	fallenRedPucks := 0
@@ -68,7 +120,7 @@ func getFlippedPucks(currentGame game.Game) (int, int) {
 	flippedBluePuck := 0
 
 	for _, puck := range currentGame.Pucks {
-		if puck.Flipped == true && puck.Color == "red" {
+		if puck.Flipped == true && puck.Color == game.RED {
 			flippedRedPuck++
 		}
 		if puck.Flipped == true && puck.Color == game.BLUE {

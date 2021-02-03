@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -10,16 +11,25 @@ import (
 )
 
 func main() {
-	inputFilePath := os.Args[1]
-	file, err := os.Open(inputFilePath)
+	inputFilePath := flag.String("file",
+		"./test/tipsy/dataset/active.json",
+		"File with the board state, default is the starting board")
+	askingPlayer := flag.String("player", game.BLUE, "Player asking for advices, default to 'blue'")
+	verbose := flag.Bool("v", false, "Verbose output")
+	file, err := os.Open(*inputFilePath)
 	if err != nil {
 		panic(err)
 	}
 	byteValue, _ := ioutil.ReadAll(file)
 
-	var game game.Game
+	var rawGame []string
 
-	json.Unmarshal(byteValue, &game)
+	json.Unmarshal(byteValue, &rawGame)
 
-	fmt.Println(ai.GetWinner(game))
+	game := game.Deserialize(rawGame)
+
+	moves := ai.GetNextMovesScores(game, *askingPlayer, *verbose)
+
+	fmt.Printf("%v", moves)
+
 }

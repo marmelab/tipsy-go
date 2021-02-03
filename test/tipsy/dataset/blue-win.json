@@ -1,70 +1,12 @@
-{
-    "currentPlayer": "blue",
-    "pucks": [{
-            "position": [0, 0],
-            "flipped": true,
-            "color": "blue"
-        },
-        {
-            "position": [0, 1],
-            "flipped": true,
-            "color": "blue"
-        },
-
-        {
-            "position": [0, 2],
-            "flipped": true,
-            "color": "blue"
-        },
-        {
-            "position": [0, 3],
-            "flipped": true,
-            "color": "blue"
-        },
-        {
-            "position": [0, 4],
-            "flipped": true,
-            "color": "blue"
-        },
-        {
-            "position": [0, 5],
-            "flipped": true,
-            "color": "blue"
-        },
-        {
-            "position": [0, 0],
-            "flipped": false,
-            "color": "red"
-        },
-        {
-            "position": [0, 1],
-            "flipped": false,
-            "color": "red"
-        },
-
-        {
-            "position": [0, 2],
-            "flipped": false,
-            "color": "red"
-        },
-        {
-            "position": [0, 3],
-            "flipped": false,
-            "color": "red"
-        },
-        {
-            "position": [0, 4],
-            "flipped": false,
-            "color": "red"
-        },
-        {
-            "position": [0, 5],
-            "flipped": false,
-            "color": "red"
-        },
-        {
-            "position": [0, 5],
-            "color": "black"
-        }
-    ]
-}
+[
+    "blue",
+    "#### ############",
+    "#| | | |#| | | |#",
+    "#| |#|B| |B|#| | ",
+    "#| |r|#|r|#|r| |#",
+    "#|#| |B|x|B| |#|#",
+    "#| |r|#|r|#|r| |#",
+    " | |#|B| |B|#| |#",
+    "#| | | |#| | | |#",
+    "############ ####"
+]

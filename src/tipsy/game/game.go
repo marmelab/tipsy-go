@@ -29,12 +29,12 @@ func Deserialize(gameString []string) Game {
 	var deserializedGame Game
 	deserializedGame.Pucks = make(map[string]Puck)
 	deserializedGame.CurrentPlayer = gameString[0]
-	for rowIndex, line := range gameString[2 : BOARD_SIZE+1] {
-		fmt.Println(line)
+	fmt.Println(gameString[1])
+	for rowIndex, line := range gameString[2 : BoardSize+2] {
+		fmt.Println(strings.Replace(line, "|", " ", -1))
 		characters := strings.Split(line, "|")
-		fmt.Println(characters)
 
-		for colIndex, char := range characters[1 : len(characters)-1] {
+		for colIndex, char := range characters[1:] {
 			position := [2]int{colIndex, rowIndex}
 			switch char {
 			case "r":
@@ -50,7 +50,7 @@ func Deserialize(gameString []string) Game {
 			}
 		}
 	}
-	if len(gameString) == BOARD_SIZE+4 {
+	if len(gameString) == BoardSize+4 {
 		for _, char := range strings.Split(gameString[10], "|") {
 			switch char {
 			case "r":
@@ -62,5 +62,6 @@ func Deserialize(gameString []string) Game {
 			}
 		}
 	}
+	fmt.Println(gameString[BoardSize+2])
 	return deserializedGame
 }
