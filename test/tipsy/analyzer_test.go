@@ -86,7 +86,8 @@ func TestBlueShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 		"#| |r|#|r|#|r| |#",
 		"#| |#|b| |b|#| |#",
 		"#| | | |#| | | |#",
-		"#################"}
+		"#################",
+		"x"}
 	currentGame := game.Deserialize(rawGame)
 	//WHEN
 	state := ai.GetWinner(currentGame)
@@ -108,7 +109,8 @@ func TestRedShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 		"#| |r|#|r|#|r| |#",
 		"#| |#|b| |b|#| |#",
 		"#| | | |#| | | |#",
-		"#################"}
+		"#################",
+		"x"}
 	game := game.Deserialize(rawGame)
 
 	//WHEN
