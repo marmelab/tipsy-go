@@ -4,6 +4,10 @@ import (
 	"tipsy/tools"
 )
 
+const (
+	BOARD_SIZE = 7
+)
+
 //Board : the board of tipsy game
 type Board struct {
 	Nodes []Node

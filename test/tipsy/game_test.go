@@ -16,7 +16,8 @@ func TestGameShouldBeWellDesiaralized(t *testing.T) {
 		"#| | |#| |#| | |#",
 		"#| |#| | | |#| |#",
 		"#| | | |#| | | |#",
-		"#################"}
+		"#################",
+		"r|b"}
 	//WHEN
 	currentGame := game.Deserialize(rawGame)
 	//THEN
@@ -46,6 +47,14 @@ func TestGameShouldBeWellDesiaralized(t *testing.T) {
 	}
 	if bluePuck.Flipped != false {
 		t.Errorf("BluePuck should not be flipped %v", currentGame)
+	}
+	redFallenPuck := currentGame.FallenPucks[0]
+	if redFallenPuck.Color != game.RED {
+		t.Errorf("Fallen RedPuck should be red %v", currentGame)
+	}
+	blueFallenPuck := currentGame.FallenPucks[1]
+	if blueFallenPuck.Color != game.BLUE {
+		t.Errorf("Fallen RedPuck should be blue %v", currentGame)
 	}
 }
 func TestThePuckShouldGoToRightWhenTiltedToEast(t *testing.T) {
