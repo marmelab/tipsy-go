@@ -220,6 +220,35 @@ func TestBlueShouldWinWhenRedJustPushLastBlueAndLastRedUnFlippedPucksOut(t *test
 	}
 }
 
+func TestAnalyzerShouldReturnThreeWinningMove(t *testing.T) {
+
+	//GIVEN
+	rawGame := []string{"blue",
+		"#### ############",
+		"#| | | |#| | | |#",
+		"#| |#| |B|B|#|b| ",
+		"#| |R|#|R|#| |R|#",
+		"#|#| | | |B|B|#|#",
+		"#| |R|#|R|#| |B|#",
+		" | |#| | | |#| |#",
+		"#| | | |#| | | |#",
+		"############ ####"}
+	game := game.Deserialize(rawGame)
+
+	//WHEN
+	moves := ai.GetNextMoves(game)
+
+	//THEN
+	if len(moves) != 3 {
+		t.Errorf("Analyzer should return just one winning move %v", moves)
+	}
+	eastWin := moves["right"]
+	southEastWin := moves["down:right"]
+	westEastWin := moves["left:right"]
+	if !eastWin || !southEastWin || !westEastWin {
+		t.Errorf("The winning move should be 'right' %v", moves)
+	}
+}
 func loadGame(filePath string) game.Game {
 	file, err := os.Open(filePath)
 	if err != nil {
