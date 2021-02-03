@@ -72,7 +72,7 @@ func TestThePuckShouldGoToRightWhenTiltedToEast(t *testing.T) {
 	currentGame := game.Deserialize(rawGame)
 	board := game.NewBoard()
 	//WHEN
-	currentGame = game.Tilt(currentGame, &board, "right")
+	currentGame = game.Tilt(currentGame, &board, game.RIGHT)
 	//THEN
 	bluePuck, bluePuckExist := currentGame.Pucks["2:0"]
 	if !bluePuckExist || bluePuck.Color != game.BLUE {
@@ -96,7 +96,7 @@ func TestThePuckShoulBeStoppedByAnotherPuck(t *testing.T) {
 	board := game.NewBoard()
 
 	//WHEN
-	currentGame = game.Tilt(currentGame, &board, "right")
+	currentGame = game.Tilt(currentGame, &board, game.RIGHT)
 
 	//THEN
 	bluePuck20, bluePuck20Exists := currentGame.Pucks["2:0"]
@@ -125,7 +125,7 @@ func TestBothPucksShouldMoveToTheSouthAndStoppedByTheWall(t *testing.T) {
 	board := game.NewBoard()
 
 	//WHEN
-	currentGame = game.Tilt(currentGame, &board, "down")
+	currentGame = game.Tilt(currentGame, &board, game.DOWN)
 
 	//THEN
 	bluePuck34, bluePuck34Exists := currentGame.Pucks["3:4"]
@@ -154,7 +154,7 @@ func TestThreePucksShouldMoveToTheSouthAndStoppedByTheWall(t *testing.T) {
 	board := game.NewBoard()
 
 	//WHEN
-	currentGame = game.Tilt(currentGame, &board, "down")
+	currentGame = game.Tilt(currentGame, &board, game.DOWN)
 
 	//THEN
 	bluePuck33, bluePuck33Exists := currentGame.Pucks["3:3"]
@@ -187,7 +187,7 @@ func TestStuckPucksShouldNotMove(t *testing.T) {
 	board := game.NewBoard()
 
 	//WHEN
-	currentGame = game.Tilt(currentGame, &board, "right")
+	currentGame = game.Tilt(currentGame, &board, game.RIGHT)
 
 	//THEN
 	bluePuck21, bluePuck21Exists := currentGame.Pucks["2:1"]
@@ -220,7 +220,7 @@ func TestSomePuckShouldMoveAndSomeShouldBeBlocked(t *testing.T) {
 	board := game.NewBoard()
 
 	//WHEN
-	currentGame = game.Tilt(currentGame, &board, "up")
+	currentGame = game.Tilt(currentGame, &board, game.UP)
 
 	//THEN
 	bluePuck20, bluePuck20Exists := currentGame.Pucks["2:0"]
@@ -253,7 +253,7 @@ func TestPuckShouldFallWhenNextToAnExitAndTiltTowardIt(t *testing.T) {
 	board := game.NewBoard()
 
 	//WHEN
-	currentGame = game.Tilt(currentGame, &board, "right")
+	currentGame = game.Tilt(currentGame, &board, game.RIGHT)
 
 	//THEN
 	_, stillExists := currentGame.Pucks["6:1"]

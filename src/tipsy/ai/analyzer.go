@@ -7,25 +7,24 @@ import (
 
 //GetNextMovesScores evaluate each move to find which win or not
 func GetNextMovesScores(currentGame game.Game, verbose bool) map[string]int {
-	directions := [4]string{"right", "left", "up", "down"}
 	moves := make(map[string]int)
 	board := game.NewBoard()
-	for _, firstDirection := range directions {
+	for _, firstDirection := range game.Directions {
 		if verbose {
 			fmt.Printf("%v", firstDirection)
 		}
 		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
-		score := GetScore(firstMoveGame, currentGame.CurrentPlayer)
+		score := GetScore(firstMoveGame)
 		if score != WinningScore && score != LosingScore {
 			if verbose {
 				fmt.Println()
 			}
-			for _, secondDirection := range directions {
+			for _, secondDirection := range game.Directions {
 				if verbose {
 					fmt.Printf("|-- %v", secondDirection)
 				}
 				secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
-				score := GetScore(secondMoveGame, currentGame.CurrentPlayer)
+				score := GetScore(secondMoveGame)
 
 				if verbose {
 					fmt.Printf(" => %v", score)
@@ -46,34 +45,50 @@ func GetNextMovesScores(currentGame game.Game, verbose bool) map[string]int {
 	return moves
 }
 
-func getFallenPucks(currentGame game.Game) (int, int, bool) {
+//MinMax evaluate best move giving a depth and a starting game
+func MinMax(currentGame game.Game, depth int, maximizingPlayer bool, verbose bool) (int, string) {
+	if depth == 0 {
+		return GetScore(currentGame), "None"
+	}
+	board := game.NewBoard()
+	if maximizingPlayer {
+		value := -9999999
+		directions := "None"
+		for _, firstDirection := range game.Directions {
+			for _, secondDirection := range game.Directions {
+				if verbose {
+					fmt.Printf("Exploring %v %v\n", firstDirection, secondDirection)
+				}
+				nextGame := game.Tilt(currentGame, &board, firstDirection)
+				nextGame = game.Tilt(nextGame, &board, secondDirection)
+				// nextGame = game.SwitchPlayer(nextGame)
+				// nextGame = game.ReplacePucks(nextGame)
+				nextGameScore, _ := MinMax(nextGame, depth-1, false, verbose)
+				if nextGameScore > value {
+					value = nextGameScore
+					directions = firstDirection + ":" + secondDirection
+				}
+			}
+		}
+		return value, directions
+	}
 
-	fallenRedPucks := 0
-	fallenBluePucks := 0
-	fallenBlackPuck := false
-	for _, puck := range currentGame.FallenPucks {
-		switch puck.Color {
-		case game.BLUE:
-			fallenBluePucks++
-		case game.RED:
-			fallenRedPucks++
-		case game.BLACK:
-			fallenBlackPuck = true
+	value := 9999999
+	directions := "None"
+	for _, firstDirection := range game.Directions {
+		for _, secondDirection := range game.Directions {
+			nextGame := game.Tilt(currentGame, &board, firstDirection)
+			nextGame = game.Tilt(nextGame, &board, secondDirection)
+			// nextGame = game.SwitchPlayer(nextGame)
+			// nextGame = game.ReplacePucks(nextGame)
+			nextGameScore, _ := MinMax(nextGame, depth-1, true, verbose)
+
+			if nextGameScore < value {
+				value = nextGameScore
+				directions = firstDirection + ":" + secondDirection
+			}
 		}
 	}
-	return fallenRedPucks, fallenBluePucks, fallenBlackPuck
-}
-func getFlippedPucks(currentGame game.Game) (int, int) {
-	flippedRedPuck := 0
-	flippedBluePuck := 0
+	return value, directions
 
-	for _, puck := range currentGame.Pucks {
-		if puck.Flipped == true && puck.Color == game.RED {
-			flippedRedPuck++
-		}
-		if puck.Flipped == true && puck.Color == game.BLUE {
-			flippedBluePuck++
-		}
-	}
-	return flippedRedPuck, flippedBluePuck
 }

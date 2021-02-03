@@ -6,13 +6,14 @@ const (
 	//NeutralScore The neutral score
 	NeutralScore = 0
 	//WinningScore the score when winning
-	WinningScore = 1000
+	WinningScore = 2000
 	//LosingScore the score when losing
-	LosingScore      = -1000
+	LosingScore      = -2000
+	blackPuckScore   = 20
 	flippedPuckScore = 10
 	numberOfPuck     = 6
 	oneHop           = 100
-	twoHops          = 80
+	twoHops          = 50
 	threeHops        = 40
 	fourHops         = 20
 	fiveHops         = 10
@@ -28,62 +29,88 @@ var heatMap = map[string]int{
 	"6:0": twoHops, "6:1": oneHop, "6:2": twoHops, "6:4": threeHops, "6:5": threeHops, "6:6": twoHops}
 
 //GetScore return the winner of the game, or active if no winner yet
-func GetScore(currentGame game.Game, playerAsking string) int {
+func GetScore(currentGame game.Game) int {
 
 	fallenRedPucks, fallenBluePucks, fallenBlackPuck := getFallenPucks(currentGame)
 	flippedRedPuck, flippedBluePuck := getFlippedPucks(currentGame)
 
 	if fallenBlackPuck {
-		return getAskingPlayerScore(currentGame.CurrentPlayer, playerAsking)
-	}
-	if flippedRedPuck == numberOfPuck && flippedBluePuck == numberOfPuck {
-		panic("Invalid pucks configuration, all pucks could not be flipped at the same time")
+		return WinningScore
 	}
 	if flippedRedPuck == numberOfPuck {
-		return getAskingPlayerScore(game.RED, playerAsking)
+		return getAskingPlayerScore(game.RED, currentGame.CurrentPlayer)
 	}
 	if flippedBluePuck == numberOfPuck {
-		return getAskingPlayerScore(game.BLUE, playerAsking)
+		return getAskingPlayerScore(game.BLUE, currentGame.CurrentPlayer)
 	}
 	if currentGame.CurrentPlayer == game.BLUE {
 		if flippedRedPuck+fallenRedPucks == numberOfPuck {
-			return getAskingPlayerScore(game.RED, playerAsking)
+			return getAskingPlayerScore(game.RED, currentGame.CurrentPlayer)
 		}
 		if flippedBluePuck+fallenBluePucks == numberOfPuck {
-			return getAskingPlayerScore(game.BLUE, playerAsking)
+			return getAskingPlayerScore(game.BLUE, currentGame.CurrentPlayer)
 		}
 	}
 	if currentGame.CurrentPlayer == game.RED {
 		if flippedBluePuck+fallenBluePucks == numberOfPuck {
-			return getAskingPlayerScore(game.BLUE, playerAsking)
+			return getAskingPlayerScore(game.BLUE, currentGame.CurrentPlayer)
 		}
 		if flippedRedPuck+fallenRedPucks == numberOfPuck {
-			return getAskingPlayerScore(game.RED, playerAsking)
+			return getAskingPlayerScore(game.RED, currentGame.CurrentPlayer)
 		}
 	}
 
-	return getActiveScore(currentGame, playerAsking)
+	return getActiveScore(currentGame)
 }
 
-func getActiveScore(currentGame game.Game, askingPlayer string) int {
+func getFlippedPucks(currentGame game.Game) (int, int) {
+	flippedRedPuck := 0
+	flippedBluePuck := 0
+
+	for _, puck := range currentGame.Pucks {
+		if puck.Flipped == true && puck.Color == game.RED {
+			flippedRedPuck++
+		}
+		if puck.Flipped == true && puck.Color == game.BLUE {
+			flippedBluePuck++
+		}
+	}
+	return flippedRedPuck, flippedBluePuck
+}
+
+func getFallenPucks(currentGame game.Game) (int, int, bool) {
+
+	fallenRedPucks := 0
+	fallenBluePucks := 0
+	fallenBlackPuck := false
+	for _, puck := range currentGame.FallenPucks {
+		switch puck.Color {
+		case game.BLUE:
+			fallenBluePucks++
+		case game.RED:
+			fallenRedPucks++
+		case game.BLACK:
+			fallenBlackPuck = true
+		}
+	}
+	return fallenRedPucks, fallenBluePucks, fallenBlackPuck
+}
+
+func getActiveScore(currentGame game.Game) int {
 	score := NeutralScore
 	for key, puck := range currentGame.Pucks {
 		if !puck.Flipped {
 			switch puck.Color {
 			case game.BLACK:
-				if currentGame.CurrentPlayer == askingPlayer {
-					score -= heatMap[key] * 10
-				} else {
-					score += heatMap[key] * 10
-				}
-			case askingPlayer:
+				score -= heatMap[key] * blackPuckScore
+			case currentGame.CurrentPlayer:
 				score += heatMap[key]
 			default:
 				score -= heatMap[key]
 			}
 		} else {
 			switch puck.Color {
-			case askingPlayer:
+			case currentGame.CurrentPlayer:
 				score += flippedPuckScore
 			default:
 				score -= flippedPuckScore

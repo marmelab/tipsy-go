@@ -1,5 +1,6 @@
 .PHONY: test
-
+file ?= ./test/tipsy/dataset/active.json
+verbose ?= false
 install:
 	docker-compose build
 

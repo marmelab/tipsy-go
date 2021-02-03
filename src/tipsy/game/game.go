@@ -15,13 +15,33 @@ const (
 	BLACK = "black"
 	//ACTIVE game is still active, no winner yet
 	ACTIVE = "active"
+	//RIGHT direction
+	RIGHT = "right"
+	//LEFT direction
+	LEFT = "left"
+	//UP direction
+	UP = "up"
+	//DOWN direction
+	DOWN = "down"
 )
+
+//Directions of the game
+var Directions = [4]string{RIGHT, LEFT, UP, DOWN}
 
 //Game the game state
 type Game struct {
 	Pucks         map[string]Puck `json:"pucks"`
 	FallenPucks   []Puck
 	CurrentPlayer string `json:"currentPlayer"`
+}
+
+func SwitchPlayer(game Game) Game {
+	if game.CurrentPlayer == RED {
+		game.CurrentPlayer = BLUE
+	} else {
+		game.CurrentPlayer = RED
+	}
+	return game
 }
 
 //Deserialize a game represented in string array

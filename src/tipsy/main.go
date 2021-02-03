@@ -26,10 +26,7 @@ func main() {
 
 	json.Unmarshal(byteValue, &rawGame)
 
-	game := game.Deserialize(rawGame)
-
-	moves := ai.GetNextMovesScores(game, *verbose)
-
-	fmt.Printf("%v", moves)
-
+	currentGame := game.Deserialize(rawGame)
+	score, bestMove := ai.MinMax(currentGame, 2, true, *verbose)
+	fmt.Printf("Best Move : %v %v", bestMove, score)
 }
