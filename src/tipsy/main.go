@@ -15,6 +15,7 @@ func main() {
 		"./test/tipsy/dataset/active.json",
 		"File with the board state, default is the starting board")
 	verbose := flag.Bool("v", false, "Verbose output")
+	flag.Parse()
 	file, err := os.Open(*inputFilePath)
 	if err != nil {
 		panic(err)
