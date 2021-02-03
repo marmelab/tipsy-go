@@ -157,7 +157,11 @@ func movePuckTo(puckKey string, currentPuck Puck,
 		}
 	}
 	nextFreeCell := getNextFreeCell(tools.GetPositionFromKey(puckKey), gamePucks, board, direction)
-	pucks[tools.GetKeyFromPosition(nextFreeCell)] = currentPuck
+	if isExit(nextFreeCell, board) {
+		fallenPucks = append(fallenPucks, currentPuck)
+	} else {
+		pucks[tools.GetKeyFromPosition(nextFreeCell)] = currentPuck
+	}
 	return pucks, fallenPucks
 
 }

@@ -236,3 +236,28 @@ func TestSomePuckShouldMoveAndSomeShouldBeBlocked(t *testing.T) {
 		t.Errorf("Puck should be on (4,0) %v", currentGame)
 	}
 }
+
+func TestPuckShouldFallWhenNextToAnExitAndTiltTowardIt(t *testing.T) {
+	//GIVEN
+	rawGame := []string{"red",
+		"#################",
+		"#| | | |#| | | |#",
+		"#| |#| | | |#|b| ",
+		"#| | |#| |#| | |#",
+		"#|#| | | | | |#|#",
+		"#| | |#| |#| | |#",
+		"#| |#| | | |#| |#",
+		"#| | | |#| | | |#",
+		"#################"}
+	currentGame := game.Deserialize(rawGame)
+	board := game.NewBoard()
+
+	//WHEN
+	currentGame = game.Tilt(currentGame, &board, "east")
+
+	//THEN
+	blueFallenPuck := currentGame.FallenPucks[0]
+	if !(blueFallenPuck.Color == game.BLUE) {
+		t.Errorf("Blue Puck should have Fall %v", currentGame)
+	}
+}
