@@ -29,13 +29,13 @@ func GetNextMovesScores(currentGame game.Game, askingPlayer string) map[string]i
 				secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
 				score := GetScore(secondMoveGame, askingPlayer)
 				if score != ActiveScore {
-					fmt.Printf(" => %v win", score)
+					fmt.Printf(" => %v", score)
 					moves[firstDirection+":"+secondDirection] = score
 				}
 				fmt.Println()
 			}
 		} else {
-			fmt.Printf(" => %v win\n", score)
+			fmt.Printf(" => %v\n", score)
 			moves[firstDirection] = score
 		}
 	}
