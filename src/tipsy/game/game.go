@@ -18,7 +18,8 @@ const (
 //Game the game state
 type Game struct {
 	Pucks         map[string]Puck `json:"pucks"`
-	CurrentPlayer string          `json:"currentPlayer"`
+	FallenPucks   []Puck
+	CurrentPlayer string `json:"currentPlayer"`
 }
 
 //Deserialize a game represented in string array
@@ -49,4 +50,3 @@ func Deserialize(gameString []string) Game {
 	}
 	return game
 }
-

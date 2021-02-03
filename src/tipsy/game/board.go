@@ -88,12 +88,14 @@ func Contains(position [2]int, board *Board) bool {
 	}
 	return false
 }
+
 func getPositionFromKey(key string) [2]int {
 	positions := strings.Split(key, ":")
 	x, _ := strconv.Atoi(positions[0])
 	y, _ := strconv.Atoi(positions[1])
 	return [2]int{x, y}
 }
+
 func getKeyFromPosition(position [2]int) string {
 	return strconv.Itoa(position[0]) + ":" + strconv.Itoa(position[1])
 }
@@ -131,7 +133,13 @@ func getNextFreeCell(position [2]int, gamePucks map[string]Puck, board *Board, d
 	return getNextFreeCell(neighbor.Position, gamePucks, board, direction)
 }
 
-func movePuckTo(puckKey string, puck Puck, gamePucks map[string]Puck, board *Board, direction string) map[string]Puck {
+func isExit(position [2]int, board *Board) bool {
+	node := getNode(position, board)
+	return node.Exit
+}
+
+func movePuckTo(puckKey string, currentPuck Puck,
+	gamePucks map[string]Puck, board *Board, direction string) (map[string]Puck, []Puck) {
 
 	neighbor := getNeighbor(getPositionFromKey(puckKey), board, direction)
 	var nodesWithPuck []Node
@@ -141,32 +149,40 @@ func movePuckTo(puckKey string, puck Puck, gamePucks map[string]Puck, board *Boa
 	}
 
 	pucks := make(map[string]Puck)
+	var fallenPucks []Puck
 	for i := len(nodesWithPuck) - 1; i >= 0; i-- {
 		nodeWithPuck := nodesWithPuck[i]
 		nextFreeCell := getNextFreeCell(nodeWithPuck.Position, gamePucks, board, direction)
 		puck := getPuck(nodeWithPuck, gamePucks)
 		nextFreeCellKey := getKeyFromPosition(nextFreeCell)
 		if nextFreeCell != nodeWithPuck.Position {
-			pucks[nextFreeCellKey] = puck
-			gamePucks[nextFreeCellKey] = puck
+			if isExit(nextFreeCell, board) {
+				fallenPucks = append(fallenPucks, puck)
+			} else {
+				pucks[nextFreeCellKey] = puck
+				gamePucks[nextFreeCellKey] = puck
+			}
 			delete(gamePucks, getKeyFromPosition(nodeWithPuck.Position))
 		}
 	}
 	nextFreeCell := getNextFreeCell(getPositionFromKey(puckKey), gamePucks, board, direction)
-	pucks[getKeyFromPosition(nextFreeCell)] = puck
-	return pucks
+	pucks[getKeyFromPosition(nextFreeCell)] = currentPuck
+	return pucks, fallenPucks
 
 }
 
 //Tilt the game in a given direction
 func Tilt(game Game, board *Board, direction string) Game {
-	pucks := make(map[string]Puck)
+	gamePucks := make(map[string]Puck)
+	var gameFallenPucks []Puck
 	for key, puck := range game.Pucks {
-		movedPucks := movePuckTo(key, puck, game.Pucks, board, direction)
+		movedPucks, fallenPucks := movePuckTo(key, puck, game.Pucks, board, direction)
 		for key, puck := range movedPucks {
-			pucks[key] = puck
+			gamePucks[key] = puck
 		}
+		gameFallenPucks = append(gameFallenPucks,fallenPucks...)
 	}
-	game.Pucks = pucks
+	game.Pucks = gamePucks
+	game.FallenPucks = gameFallenPucks
 	return game
 }
