@@ -23,10 +23,10 @@ func TestRedShouldBeTheWinnerIfAllSixRedPucksAreFlipped(t *testing.T) {
 		"#################"}
 	game := game.Deserialize(rawGame)
 	//WHEN
-	state := ai.GetScore(game, "blue")
+	score := ai.GetScore(game, "blue")
 	//THEN
-	if state != ai.LosingScore {
-		t.Errorf("Winner shoul be red: %v => %v", game, state)
+	if score != ai.LosingScore {
+		t.Errorf("Winner shoul be red: %v => %v", game, score)
 	}
 }
 
@@ -45,10 +45,10 @@ func TestBlueShouldBeTheWinnerIfAllSixBluePucksAreFlipped(t *testing.T) {
 		"#################"}
 	currentGame := game.Deserialize(rawGame)
 	//WHEN
-	state := ai.GetScore(currentGame, "blue")
+	score := ai.GetScore(currentGame, "blue")
 	//THEN
-	if state != ai.WinningScore {
-		t.Errorf("Winner should be blue: %v => %v", currentGame, state)
+	if score != ai.WinningScore {
+		t.Errorf("Winner should be blue: %v => %v", currentGame, score)
 	}
 }
 
@@ -67,10 +67,10 @@ func TestShouldBeActiveIfNeitherBlueOrRedHaveSixPucksFlipped(t *testing.T) {
 		"#################"}
 	game := game.Deserialize(rawGame)
 	//WHEN
-	state := ai.GetScore(game, "blue")
+	score := ai.GetScore(game, "blue")
 	//THEN
-	if state != ai.NeutralScore {
-		t.Errorf("Game should be active: %v => %v", rawGame, state)
+	if score == ai.WinningScore || score == ai.LosingScore {
+		t.Errorf("Game should be active: %v ", score)
 	}
 }
 
@@ -90,10 +90,10 @@ func TestBlueShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 		"x"}
 	currentGame := game.Deserialize(rawGame)
 	//WHEN
-	state := ai.GetScore(currentGame, "blue")
+	score := ai.GetScore(currentGame, "blue")
 	//THEN
-	if state != ai.WinningScore {
-		t.Errorf("Blue should win as he pushed the black puck out: %v => %v", currentGame, state)
+	if score != ai.WinningScore {
+		t.Errorf("Blue should win as he pushed the black puck out: %v => %v", currentGame, score)
 	}
 }
 
@@ -114,11 +114,11 @@ func TestRedShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	state := ai.GetScore(game, "red")
+	score := ai.GetScore(game, "red")
 
 	//THEN
-	if state != ai.WinningScore {
-		t.Errorf("Red should win as he pushed the black puck out: %v => %v", game, state)
+	if score != ai.WinningScore {
+		t.Errorf("Red should win as he pushed the black puck out: %v => %v", game, score)
 	}
 }
 
@@ -139,11 +139,11 @@ func TestRedShouldWinWhenHeJustPushHisLastUnFlippedPuckOut(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	state := ai.GetScore(game, "red")
+	score := ai.GetScore(game, "red")
 
 	//THEN
-	if state != ai.WinningScore {
-		t.Errorf("Red should win as he pushed his last unflipped puck out: %v => %v", game, state)
+	if score != ai.WinningScore {
+		t.Errorf("Red should win as he pushed his last unflipped puck out: %v => %v", game, score)
 	}
 }
 func TestRedShouldWinWhenHeJustPushHisTwoLastUnFlippedPucksOut(t *testing.T) {
@@ -163,11 +163,11 @@ func TestRedShouldWinWhenHeJustPushHisTwoLastUnFlippedPucksOut(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	state := ai.GetScore(game, "red")
+	score := ai.GetScore(game, "red")
 
 	//THEN
-	if state != ai.WinningScore {
-		t.Errorf("Red should win as he pushed his two last unflipped pucks out: %v => %v", game, state)
+	if score != ai.WinningScore {
+		t.Errorf("Red should win as he pushed his two last unflipped pucks out: %v => %v", game, score)
 	}
 }
 func TestBlueShouldWinWhenRedJustPushLastBlueUnFlippedPucksOut(t *testing.T) {
@@ -187,11 +187,11 @@ func TestBlueShouldWinWhenRedJustPushLastBlueUnFlippedPucksOut(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	state := ai.GetScore(game, "blue")
+	score := ai.GetScore(game, "blue")
 
 	//THEN
-	if state != ai.WinningScore {
-		t.Errorf("Blue should win as Red pushed Blue last unflipped puck out: %v => %v", game, state)
+	if score != ai.WinningScore {
+		t.Errorf("Blue should win as Red pushed Blue last unflipped puck out: %v => %v", game, score)
 	}
 }
 
@@ -212,11 +212,11 @@ func TestBlueShouldWinWhenRedJustPushLastBlueAndLastRedUnFlippedPucksOut(t *test
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	state := ai.GetScore(game, "blue")
+	score := ai.GetScore(game, "blue")
 
 	//THEN
-	if state != ai.WinningScore {
-		t.Errorf("Blue should win as Red pushed Blue and Red last unflipped pucks out: %v => %v", game, state)
+	if score != ai.WinningScore {
+		t.Errorf("Blue should win as Red pushed Blue and Red last unflipped pucks out: %v => %v", game, score)
 	}
 }
 
@@ -237,12 +237,9 @@ func TestMoveToEastShouldBePartOfTheWinsWhenLastBlueNearExit(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	moves := ai.GetNextMovesScores(game, "blue", true)
+	moves := ai.GetNextMovesScores(game, true)
 
 	//THEN
-	if len(moves) != 3 {
-		t.Errorf("Analyzer should return just one winning move %v", moves)
-	}
 	rightWin := moves["right"]
 	downRightWin := moves["down:right"]
 	leftRightWin := moves["left:right"]
@@ -268,16 +265,13 @@ func TestMoveToEastShouldBePartOfTheLoseWhenLastBlueNearExit(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	moves := ai.GetNextMovesScores(game, "red", true)
+	moves := ai.GetNextMovesScores(game, true)
 
 	//THEN
-	if len(moves) != 3 {
-		t.Errorf("Analyzer should return just one winning move %v", moves)
-	}
 	rightWin := moves["right"]
 	downRightWin := moves["down:right"]
 	leftRightWin := moves["left:right"]
-	if (rightWin == ai.WinningScore) || (downRightWin == ai.WinningScore) || (leftRightWin == ai.WinningScore) {
+	if (rightWin != ai.LosingScore) || (downRightWin != ai.LosingScore) || (leftRightWin != ai.LosingScore) {
 		t.Errorf("The losing move should be 'right' %v", moves)
 	}
 }
@@ -299,12 +293,38 @@ func TestMoveToUpRightShouldBePartOfTheWinsWhenLastBlueIsOneCellNearExit(t *test
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	moves := ai.GetNextMovesScores(game, "blue", true)
+	moves := ai.GetNextMovesScores(game, true)
 
 	//THEN
 	upRightWin := moves["up:right"]
 	if !(upRightWin == ai.WinningScore) {
 		t.Errorf("The winning move should be 'right' %v", moves)
+	}
+}
+
+func TestBestMoveShouldBeToMoveBlackFarOfTheExit(t *testing.T) {
+
+	//GIVEN
+	rawGame := []string{"blue",
+		"#### ############",
+		"#| | | |#| | |x|#",
+		"#| |#|b| |b|#| | ",
+		"#| |r|#|r|#|r| |#",
+		"#|#| |b| |b| |#|#",
+		"#| |r|#|r|#|r| |#",
+		" | |#|b| |b|#| |#",
+		"#| | | |#| | | |#",
+		"############ ####"}
+	game := game.Deserialize(rawGame)
+
+	//WHEN
+	moves := ai.GetNextMovesScores(game, true)
+
+	//THEN
+	leftDown := moves["left:down"]
+
+	if leftDown != -350 {
+		t.Errorf("Best move should be 'up:right' %v", moves)
 	}
 }
 

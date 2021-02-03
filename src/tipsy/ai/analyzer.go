@@ -6,7 +6,7 @@ import (
 )
 
 //GetNextMovesScores evaluate each move to find which win or not
-func GetNextMovesScores(currentGame game.Game, askingPlayer string, verbose bool) map[string]int {
+func GetNextMovesScores(currentGame game.Game, verbose bool) map[string]int {
 	directions := [4]string{"right", "left", "up", "down"}
 	moves := make(map[string]int)
 	board := game.NewBoard()
@@ -15,8 +15,8 @@ func GetNextMovesScores(currentGame game.Game, askingPlayer string, verbose bool
 			fmt.Printf("%v", firstDirection)
 		}
 		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
-		score := GetScore(firstMoveGame, askingPlayer)
-		if score == NeutralScore {
+		score := GetScore(firstMoveGame, currentGame.CurrentPlayer)
+		if score != WinningScore && score != LosingScore {
 			if verbose {
 				fmt.Println()
 			}
@@ -25,13 +25,13 @@ func GetNextMovesScores(currentGame game.Game, askingPlayer string, verbose bool
 					fmt.Printf("|-- %v", secondDirection)
 				}
 				secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
-				score := GetScore(secondMoveGame, askingPlayer)
-				if score != NeutralScore {
-					if verbose {
-						fmt.Printf(" => %v", score)
-					}
-					moves[firstDirection+":"+secondDirection] = score
+				score := GetScore(secondMoveGame, currentGame.CurrentPlayer)
+
+				if verbose {
+					fmt.Printf(" => %v", score)
 				}
+				moves[firstDirection+":"+secondDirection] = score
+
 				if verbose {
 					fmt.Println()
 				}
@@ -45,7 +45,6 @@ func GetNextMovesScores(currentGame game.Game, askingPlayer string, verbose bool
 	}
 	return moves
 }
-
 
 func getFallenPucks(currentGame game.Game) (int, int, bool) {
 
