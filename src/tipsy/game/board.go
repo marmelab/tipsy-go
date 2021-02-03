@@ -1,6 +1,8 @@
 package game
 
 import (
+	"strconv"
+	"strings"
 	"tipsy/tools"
 )
 
@@ -54,13 +56,12 @@ func initEdges(board *Board) {
 
 func addEdge(from Node, to [2]int, value string, board *Board) {
 	if Contains(to, board) {
-		var to = GetNode(to, board)
+		var to = getNode(to, board)
 		(*board).Edges = append(board.Edges, Edge{From: from, To: to, Value: value})
 	}
 }
 
-//GetNode gets the node given a position
-func GetNode(position [2]int, board *Board) Node {
+func getNode(position [2]int, board *Board) Node {
 	for _, node := range board.Nodes {
 		if node.Position[0] == position[0] && node.Position[1] == position[1] {
 			return node
@@ -69,8 +70,7 @@ func GetNode(position [2]int, board *Board) Node {
 	return Node{}
 }
 
-//GetNodeTo gets the node from a given one to a given direction
-func GetNodeTo(node Node, board *Board, direction string) Node {
+func getNodeTo(node Node, board *Board, direction string) Node {
 	for _, edge := range board.Edges {
 		if edge.From == node && edge.Value == direction {
 			return edge.To
@@ -87,4 +87,86 @@ func Contains(position [2]int, board *Board) bool {
 		}
 	}
 	return false
+}
+func getPositionFromKey(key string) [2]int {
+	positions := strings.Split(key, ":")
+	x, _ := strconv.Atoi(positions[0])
+	y, _ := strconv.Atoi(positions[1])
+	return [2]int{x, y}
+}
+func getKeyFromPosition(position [2]int) string {
+	return strconv.Itoa(position[0]) + ":" + strconv.Itoa(position[1])
+}
+
+func getNeighbor(position [2]int, board *Board, direction string) Node {
+	puckNode := getNode(position, board)
+	return getNodeTo(puckNode, board, direction)
+}
+
+func isAPuck(node Node, gamePucks map[string]Puck) bool {
+	for key := range gamePucks {
+		if getPositionFromKey(key) == node.Position {
+			return true
+		}
+	}
+	return false
+}
+func getPuck(node Node, gamePucks map[string]Puck) Puck {
+	for key, puck := range gamePucks {
+		if getPositionFromKey(key) == node.Position {
+			return puck
+		}
+	}
+	panic("No Puck on this node")
+}
+func isAWall(node Node, board *Board) bool {
+	return (Node{}) == getNode(node.Position, board)
+}
+
+func getNextFreeCell(position [2]int, gamePucks map[string]Puck, board *Board, direction string) [2]int {
+	neighbor := getNeighbor(position, board, direction)
+	if isAPuck(neighbor, gamePucks) || isAWall(neighbor, board) {
+		return position
+	}
+	return getNextFreeCell(neighbor.Position, gamePucks, board, direction)
+}
+
+func movePuckTo(puckKey string, puck Puck, gamePucks map[string]Puck, board *Board, direction string) map[string]Puck {
+
+	neighbor := getNeighbor(getPositionFromKey(puckKey), board, direction)
+	var nodesWithPuck []Node
+	for isAPuck(neighbor, gamePucks) {
+		nodesWithPuck = append(nodesWithPuck, neighbor)
+		neighbor = getNeighbor(neighbor.Position, board, direction)
+	}
+
+	pucks := make(map[string]Puck)
+	for i := len(nodesWithPuck) - 1; i >= 0; i-- {
+		nodeWithPuck := nodesWithPuck[i]
+		nextFreeCell := getNextFreeCell(nodeWithPuck.Position, gamePucks, board, direction)
+		puck := getPuck(nodeWithPuck, gamePucks)
+		nextFreeCellKey := getKeyFromPosition(nextFreeCell)
+		if nextFreeCell != nodeWithPuck.Position {
+			pucks[nextFreeCellKey] = puck
+			gamePucks[nextFreeCellKey] = puck
+			delete(gamePucks, getKeyFromPosition(nodeWithPuck.Position))
+		}
+	}
+	nextFreeCell := getNextFreeCell(getPositionFromKey(puckKey), gamePucks, board, direction)
+	pucks[getKeyFromPosition(nextFreeCell)] = puck
+	return pucks
+
+}
+
+//Tilt the game in a given direction
+func Tilt(game Game, board *Board, direction string) Game {
+	pucks := make(map[string]Puck)
+	for key, puck := range game.Pucks {
+		movedPucks := movePuckTo(key, puck, game.Pucks, board, direction)
+		for key, puck := range movedPucks {
+			pucks[key] = puck
+		}
+	}
+	game.Pucks = pucks
+	return game
 }
