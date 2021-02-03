@@ -6,20 +6,20 @@ import (
 
 //Board : the board of tipsy game
 type Board struct {
-	Vertices []Vertex
-	Edges    []Edge
+	Nodes []Node
+	Edges []Edge
 }
 
 //NewBoard initialize an empty board with obstacles and exits
 func NewBoard() Board {
 
 	var board Board
-	initVertices(&board)
+	initNodes(&board)
 	initEdges(&board)
 	return board
 }
 
-func initVertices(board *Board) {
+func initNodes(board *Board) {
 	obstacles := [][2]int{
 		{0, 3}, {1, 1}, {1, 5}, {2, 2},
 		{2, 4}, {3, 0}, {3, 6}, {4, 2},
@@ -30,47 +30,59 @@ func initVertices(board *Board) {
 	for i := 0; i < 7; i++ {
 		for j := 0; j < 7; j++ {
 			if !tools.ArrayContains(obstacles, []int{i, j}) {
-				(*board).Vertices = append((*board).Vertices, Vertex{Position: [2]int{i, j}})
+				(*board).Nodes = append((*board).Nodes, Node{Position: [2]int{i, j}})
 			}
 		}
 	}
 	for _, exit := range exits {
-		(*board).Vertices = append((*board).Vertices, Vertex{Position: [2]int{exit[0], exit[1]}, Exit: true})
+		(*board).Nodes = append((*board).Nodes, Node{Position: [2]int{exit[0], exit[1]}, Exit: true})
 	}
 }
 
 func initEdges(board *Board) {
-	for _, vertex := range (*board).Vertices {
-		var rightPosition = [2]int{vertex.Position[0] + 1, vertex.Position[1]}
-		var leftPosition = [2]int{vertex.Position[0] - 1, vertex.Position[1]}
-		var upPosition = [2]int{vertex.Position[0], vertex.Position[1] - 1}
-		var downPosition = [2]int{vertex.Position[0], vertex.Position[1] + 1}
-		addEdge(&vertex, leftPosition, "left", board)
-		addEdge(&vertex, rightPosition, "right", board)
-		addEdge(&vertex, upPosition, "up", board)
-		addEdge(&vertex, downPosition, "down", board)
+	for _, node := range board.Nodes {
+		var rightPosition = [2]int{node.Position[0] + 1, node.Position[1]}
+		var leftPosition = [2]int{node.Position[0] - 1, node.Position[1]}
+		var upPosition = [2]int{node.Position[0], node.Position[1] - 1}
+		var downPosition = [2]int{node.Position[0], node.Position[1] + 1}
+		addEdge(node, leftPosition, "west", board)
+		addEdge(node, rightPosition, "east", board)
+		addEdge(node, upPosition, "north", board)
+		addEdge(node, downPosition, "south", board)
 	}
 }
 
-func addEdge(from *Vertex, to [2]int, value string, board *Board) {
-	if Contains(to, (*board)) {
-		var to = getVertex(to, (*board))
-		(*board).Edges = append((*board).Edges, Edge{From: from, To: &to, Value: value})
+func addEdge(from Node, to [2]int, value string, board *Board) {
+	if Contains(to, board) {
+		var to = GetNode(to, board)
+		(*board).Edges = append(board.Edges, Edge{From: from, To: to, Value: value})
 	}
 }
-func getVertex(position [2]int, board Board) Vertex {
-	for _, vertex := range board.Vertices {
-		if vertex.Position[0] == position[0] && vertex.Position[1] == position[1] {
-			return vertex
+
+//GetNode gets the node given a position
+func GetNode(position [2]int, board *Board) Node {
+	for _, node := range board.Nodes {
+		if node.Position[0] == position[0] && node.Position[1] == position[1] {
+			return node
 		}
 	}
-	return Vertex{}
+	return Node{}
 }
 
-// Contains return true if board contains a Vertex at a given position, and false otherwise.
-func Contains(position [2]int, board Board) bool {
-	for _, vertex := range board.Vertices {
-		if vertex.Position[0] == position[0] && vertex.Position[1] == position[1] {
+//GetNodeTo gets the node from a given one to a given direction
+func GetNodeTo(node Node, board *Board, direction string) Node {
+	for _, edge := range board.Edges {
+		if edge.From == node && edge.Value == direction {
+			return edge.To
+		}
+	}
+	return Node{}
+}
+
+// Contains return true if board contains a Node at a given position, and false otherwise.
+func Contains(position [2]int, board *Board) bool {
+	for _, Node := range board.Nodes {
+		if Node.Position[0] == position[0] && Node.Position[1] == position[1] {
 			return true
 		}
 	}
