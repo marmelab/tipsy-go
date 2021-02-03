@@ -2,8 +2,8 @@ package game
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
+	"tipsy/tools"
 )
 
 const (
@@ -11,6 +11,8 @@ const (
 	BLUE = "blue"
 	//RED color constant
 	RED = "red"
+	//BLACK color constant
+	BLACK = "black"
 	//ACTIVE game is still active, no winner yet
 	ACTIVE = "active"
 )
@@ -18,116 +20,47 @@ const (
 //Game the game state
 type Game struct {
 	Pucks         map[string]Puck `json:"pucks"`
-	CurrentPlayer string          `json:"currentPlayer"`
+	FallenPucks   []Puck
+	CurrentPlayer string `json:"currentPlayer"`
 }
 
 //Deserialize a game represented in string array
 func Deserialize(gameString []string) Game {
-	var game Game
-	game.Pucks = make(map[string]Puck)
-	for line, value := range gameString {
-		if line == 0 {
-			game.CurrentPlayer = value
-		}
-		characters := strings.Split(gameString[line], "|")
+	var deserializedGame Game
+	deserializedGame.Pucks = make(map[string]Puck)
+	deserializedGame.CurrentPlayer = gameString[0]
+	for rowIndex, line := range gameString[2 : BOARD_SIZE+1] {
+		fmt.Println(line)
+		characters := strings.Split(line, "|")
 		fmt.Println(characters)
 
-		for col, char := range characters {
+		for colIndex, char := range characters[1 : len(characters)-1] {
+			position := [2]int{colIndex, rowIndex}
 			switch char {
 			case "r":
-				game.Pucks[strconv.Itoa(col-1)+":"+strconv.Itoa(line-2)] = Puck{Color: "red"}
+				deserializedGame.Pucks[tools.GetKeyFromPosition(position)] = Puck{Color: RED}
 			case "R":
-				game.Pucks[strconv.Itoa(col-1)+":"+strconv.Itoa(line-2)] = Puck{Color: "red", Flipped: true}
+				deserializedGame.Pucks[tools.GetKeyFromPosition(position)] = Puck{Color: RED, Flipped: true}
 			case "b":
-				game.Pucks[strconv.Itoa(col-1)+":"+strconv.Itoa(line-2)] = Puck{Color: BLUE}
+				deserializedGame.Pucks[tools.GetKeyFromPosition(position)] = Puck{Color: BLUE}
 			case "B":
-				game.Pucks[strconv.Itoa(col-1)+":"+strconv.Itoa(line-2)] = Puck{Color: BLUE, Flipped: true}
+				deserializedGame.Pucks[tools.GetKeyFromPosition(position)] = Puck{Color: BLUE, Flipped: true}
 			case "x":
-				game.Pucks[strconv.Itoa(col-1)+":"+strconv.Itoa(line-2)] = Puck{Color: "black"}
+				deserializedGame.Pucks[tools.GetKeyFromPosition(position)] = Puck{Color: BLACK}
 			}
 		}
 	}
-	return game
-}
-func getPositionFromKey(key string) [2]int {
-	positions := strings.Split(key, ":")
-	x, _ := strconv.Atoi(positions[0])
-	y, _ := strconv.Atoi(positions[1])
-	return [2]int{x, y}
-}
-func getKeyFromPosition(position [2]int) string {
-	return strconv.Itoa(position[0]) + ":" + strconv.Itoa(position[1])
-}
-
-func getNeighbor(position [2]int, board *Board, direction string) Node {
-	puckNode := GetNode(position, board)
-	return GetNodeTo(puckNode, board, direction)
-}
-
-func isAPuck(node Node, gamePucks map[string]Puck) bool {
-	for key := range gamePucks {
-		if getPositionFromKey(key) == node.Position {
-			return true
+	if len(gameString) == BOARD_SIZE+4 {
+		for _, char := range strings.Split(gameString[10], "|") {
+			switch char {
+			case "r":
+				deserializedGame.FallenPucks = append(deserializedGame.FallenPucks, Puck{Color: RED})
+			case "b":
+				deserializedGame.FallenPucks = append(deserializedGame.FallenPucks, Puck{Color: BLUE})
+			case "x":
+				deserializedGame.FallenPucks = append(deserializedGame.FallenPucks, Puck{Color: BLACK})
+			}
 		}
 	}
-	return false
-}
-func getPuck(node Node, gamePucks map[string]Puck) Puck {
-	for key, puck := range gamePucks {
-		if getPositionFromKey(key) == node.Position {
-			return puck
-		}
-	}
-	panic("No Puck on this node")
-}
-func isAWall(node Node, board *Board) bool {
-	return (Node{}) == GetNode(node.Position, board)
-}
-
-func getNextFreeCell(position [2]int, gamePucks map[string]Puck, board *Board, direction string) [2]int {
-	neighbor := getNeighbor(position, board, direction)
-	if isAPuck(neighbor, gamePucks) || isAWall(neighbor, board) {
-		return position
-	}
-	return getNextFreeCell(neighbor.Position, gamePucks, board, direction)
-}
-
-func movePuckTo(puckKey string, puck Puck, gamePucks map[string]Puck, board *Board, direction string) map[string]Puck {
-
-	neighbor := getNeighbor(getPositionFromKey(puckKey), board, direction)
-	var nodesWithPuck []Node
-	for isAPuck(neighbor, gamePucks) {
-		nodesWithPuck = append(nodesWithPuck, neighbor)
-		neighbor = getNeighbor(neighbor.Position, board, direction)
-	}
-
-	pucks := make(map[string]Puck)
-	for i := len(nodesWithPuck) - 1; i >= 0; i-- {
-		nodeWithPuck := nodesWithPuck[i]
-		nextFreeCell := getNextFreeCell(nodeWithPuck.Position, gamePucks, board, direction)
-		puck := getPuck(nodeWithPuck, gamePucks)
-		nextFreeCellKey := getKeyFromPosition(nextFreeCell)
-		if nextFreeCell != nodeWithPuck.Position {
-			pucks[nextFreeCellKey] = puck
-			gamePucks[nextFreeCellKey] = puck
-			delete(gamePucks, getKeyFromPosition(nodeWithPuck.Position))
-		}
-	}
-	nextFreeCell := getNextFreeCell(getPositionFromKey(puckKey), gamePucks, board, direction)
-	pucks[getKeyFromPosition(nextFreeCell)] = puck
-	return pucks
-
-}
-
-//Tilt the game in a given direction
-func Tilt(game Game, board *Board, direction string) Game {
-	pucks := make(map[string]Puck)
-	for key, puck := range game.Pucks {
-		movedPucks := movePuckTo(key, puck, game.Pucks, board, direction)
-		for key, puck := range movedPucks {
-			pucks[key] = puck
-		}
-	}
-	game.Pucks = pucks
-	return game
+	return deserializedGame
 }
