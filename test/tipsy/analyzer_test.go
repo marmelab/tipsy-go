@@ -120,6 +120,104 @@ func TestRedShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 	}
 }
 
+func TestRedShouldWinWhenHeJustPushHisLastUnFlippedPuckOut(t *testing.T) {
+
+	//GIVEN
+	rawGame := []string{"red",
+		"#################",
+		"#| | | |#| | | |#",
+		"#| |#|b| |b|#| | ",
+		"#| |R|#|R|#| | |#",
+		"#|#| |b| |b| |#|#",
+		"#| |R|#|R|#|R| |#",
+		"#| |#|b| |b|#| |#",
+		"#| | | |#| | | |#",
+		"#################",
+		"r"}
+	game := game.Deserialize(rawGame)
+
+	//WHEN
+	state := ai.GetWinner(game)
+
+	//THEN
+	if state != "red" {
+		t.Errorf("Red should win as he pushed his last unflipped puck out: %v => %v", game, state)
+	}
+}
+func TestRedShouldWinWhenHeJustPushHisTwoLastUnFlippedPucksOut(t *testing.T) {
+
+	//GIVEN
+	rawGame := []string{"red",
+		"#################",
+		"#| | | |#| | | |#",
+		"#| |#|b| |b|#| | ",
+		"#| |R|#| |#| | |#",
+		"#|#| |b| |b| |#|#",
+		"#| |R|#|R|#|R| |#",
+		"#| |#|b| |b|#| |#",
+		"#| | | |#| | | |#",
+		"#################",
+		"r|r"}
+	game := game.Deserialize(rawGame)
+
+	//WHEN
+	state := ai.GetWinner(game)
+
+	//THEN
+	if state != "red" {
+		t.Errorf("Red should win as he pushed his two last unflipped pucks out: %v => %v", game, state)
+	}
+}
+func TestBlueShouldWinWhenRedJustPushLastBlueUnFlippedPucksOut(t *testing.T) {
+
+	//GIVEN
+	rawGame := []string{"red",
+		"#################",
+		"#| | | |#| | | |#",
+		"#| |#|B| |B|#| | ",
+		"#| |r|#|r|#|r| |#",
+		"#|#| |B| |B| |#|#",
+		"#| |r|#|r|#|r| |#",
+		"#| |#|B| | |#| |#",
+		"#| | | |#| | | |#",
+		"#################",
+		"b"}
+	game := game.Deserialize(rawGame)
+
+	//WHEN
+	state := ai.GetWinner(game)
+
+	//THEN
+	if state != "blue" {
+		t.Errorf("Blue should win as Red pushed Blue last unflipped puck out: %v => %v", game, state)
+	}
+}
+
+func TestBlueShouldWinWhenRedJustPushLastBlueAndLastRedUnFlippedPucksOut(t *testing.T) {
+
+	//GIVEN
+	rawGame := []string{"red",
+		"#################",
+		"#| | | |#| | | |#",
+		"#| |#|B| |B|#| | ",
+		"#| |R|#|R|#|R| |#",
+		"#|#| |B| |B| |#|#",
+		"#| |R|#|R|#| | |#",
+		"#| |#|B| | |#| |#",
+		"#| | | |#| | | |#",
+		"#################",
+		"b|r"}
+	game := game.Deserialize(rawGame)
+
+	//WHEN
+	state := ai.GetWinner(game)
+
+	//THEN
+	if state != "blue" {
+		t.Errorf("Blue should win as Red pushed Blue and Red last unflipped pucks out: %v => %v", game, state)
+	}
+}
+
 func loadGame(filePath string) game.Game {
 	file, err := os.Open(filePath)
 	if err != nil {
