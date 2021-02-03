@@ -14,28 +14,40 @@ const (
 )
 
 //GetNextMovesScores evaluate each move to find which win or not
-func GetNextMovesScores(currentGame game.Game, askingPlayer string) map[string]int {
+func GetNextMovesScores(currentGame game.Game, askingPlayer string, verbose bool) map[string]int {
 	directions := [4]string{"right", "left", "up", "down"}
 	moves := make(map[string]int)
 	board := game.NewBoard()
 	for _, firstDirection := range directions {
-		fmt.Printf("%v", firstDirection)
+		if verbose {
+			fmt.Printf("%v", firstDirection)
+		}
 		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
 		score := GetScore(firstMoveGame, askingPlayer)
 		if score == ActiveScore {
-			fmt.Println()
+			if verbose {
+				fmt.Println()
+			}
 			for _, secondDirection := range directions {
-				fmt.Printf("|-- %v", secondDirection)
+				if verbose {
+					fmt.Printf("|-- %v", secondDirection)
+				}
 				secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
 				score := GetScore(secondMoveGame, askingPlayer)
 				if score != ActiveScore {
-					fmt.Printf(" => %v", score)
+					if verbose {
+						fmt.Printf(" => %v", score)
+					}
 					moves[firstDirection+":"+secondDirection] = score
 				}
-				fmt.Println()
+				if verbose {
+					fmt.Println()
+				}
 			}
 		} else {
-			fmt.Printf(" => %v\n", score)
+			if verbose {
+				fmt.Printf(" => %v\n", score)
+			}
 			moves[firstDirection] = score
 		}
 	}
