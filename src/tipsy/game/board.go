@@ -1,8 +1,6 @@
 package game
 
 import (
-	"strconv"
-	"strings"
 	"tipsy/tools"
 )
 
@@ -89,17 +87,6 @@ func Contains(position [2]int, board *Board) bool {
 	return false
 }
 
-func getPositionFromKey(key string) [2]int {
-	positions := strings.Split(key, ":")
-	x, _ := strconv.Atoi(positions[0])
-	y, _ := strconv.Atoi(positions[1])
-	return [2]int{x, y}
-}
-
-func getKeyFromPosition(position [2]int) string {
-	return strconv.Itoa(position[0]) + ":" + strconv.Itoa(position[1])
-}
-
 func getNeighbor(position [2]int, board *Board, direction string) Node {
 	puckNode := getNode(position, board)
 	return getNodeTo(puckNode, board, direction)
@@ -107,7 +94,7 @@ func getNeighbor(position [2]int, board *Board, direction string) Node {
 
 func isAPuck(node Node, gamePucks map[string]Puck) bool {
 	for key := range gamePucks {
-		if getPositionFromKey(key) == node.Position {
+		if tools.GetPositionFromKey(key) == node.Position {
 			return true
 		}
 	}
@@ -115,7 +102,7 @@ func isAPuck(node Node, gamePucks map[string]Puck) bool {
 }
 func getPuck(node Node, gamePucks map[string]Puck) Puck {
 	for key, puck := range gamePucks {
-		if getPositionFromKey(key) == node.Position {
+		if tools.GetPositionFromKey(key) == node.Position {
 			return puck
 		}
 	}
@@ -141,7 +128,7 @@ func isExit(position [2]int, board *Board) bool {
 func movePuckTo(puckKey string, currentPuck Puck,
 	gamePucks map[string]Puck, board *Board, direction string) (map[string]Puck, []Puck) {
 
-	neighbor := getNeighbor(getPositionFromKey(puckKey), board, direction)
+	neighbor := getNeighbor(tools.GetPositionFromKey(puckKey), board, direction)
 	var nodesWithPuck []Node
 	for isAPuck(neighbor, gamePucks) {
 		nodesWithPuck = append(nodesWithPuck, neighbor)
@@ -154,7 +141,7 @@ func movePuckTo(puckKey string, currentPuck Puck,
 		nodeWithPuck := nodesWithPuck[i]
 		nextFreeCell := getNextFreeCell(nodeWithPuck.Position, gamePucks, board, direction)
 		puck := getPuck(nodeWithPuck, gamePucks)
-		nextFreeCellKey := getKeyFromPosition(nextFreeCell)
+		nextFreeCellKey := tools.GetKeyFromPosition(nextFreeCell)
 		if nextFreeCell != nodeWithPuck.Position {
 			if isExit(nextFreeCell, board) {
 				fallenPucks = append(fallenPucks, puck)
@@ -162,11 +149,11 @@ func movePuckTo(puckKey string, currentPuck Puck,
 				pucks[nextFreeCellKey] = puck
 				gamePucks[nextFreeCellKey] = puck
 			}
-			delete(gamePucks, getKeyFromPosition(nodeWithPuck.Position))
+			delete(gamePucks, tools.GetKeyFromPosition(nodeWithPuck.Position))
 		}
 	}
-	nextFreeCell := getNextFreeCell(getPositionFromKey(puckKey), gamePucks, board, direction)
-	pucks[getKeyFromPosition(nextFreeCell)] = currentPuck
+	nextFreeCell := getNextFreeCell(tools.GetPositionFromKey(puckKey), gamePucks, board, direction)
+	pucks[tools.GetKeyFromPosition(nextFreeCell)] = currentPuck
 	return pucks, fallenPucks
 
 }
@@ -180,7 +167,7 @@ func Tilt(game Game, board *Board, direction string) Game {
 		for key, puck := range movedPucks {
 			gamePucks[key] = puck
 		}
-		gameFallenPucks = append(gameFallenPucks,fallenPucks...)
+		gameFallenPucks = append(gameFallenPucks, fallenPucks...)
 	}
 	game.Pucks = gamePucks
 	game.FallenPucks = gameFallenPucks
