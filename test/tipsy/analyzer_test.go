@@ -220,7 +220,8 @@ func TestBlueShouldWinWhenRedJustPushLastBlueAndLastRedUnFlippedPucksOut(t *test
 	}
 }
 
-func TestAnalyzerShouldReturnThreeWinningMove(t *testing.T) {
+//last blue out in 1 move
+func TestMoveToEastShouldBePartOfTheWinsWhenLastBlueNearExit(t *testing.T) {
 
 	//GIVEN
 	rawGame := []string{"blue",
@@ -242,13 +243,76 @@ func TestAnalyzerShouldReturnThreeWinningMove(t *testing.T) {
 	if len(moves) != 3 {
 		t.Errorf("Analyzer should return just one winning move %v", moves)
 	}
-	eastWin := moves["right"]
-	southEastWin := moves["down:right"]
-	westEastWin := moves["left:right"]
-	if !eastWin || !southEastWin || !westEastWin {
+	rightWin := moves["right"]
+	downRightWin := moves["down:right"]
+	leftRightWin := moves["left:right"]
+	if !rightWin || !downRightWin || !leftRightWin {
 		t.Errorf("The winning move should be 'right' %v", moves)
 	}
 }
+
+//last blue out in 1 move when red play
+func TestMoveToEastShouldBePartOfTheLoseWhenLastBlueNearExit(t *testing.T) {
+
+	//GIVEN
+	rawGame := []string{"red",
+		"#### ############",
+		"#| | | |#| | | |#",
+		"#| |#| |B|B|#|b| ",
+		"#| |R|#|R|#| |R|#",
+		"#|#| | | |B|B|#|#",
+		"#| |R|#|R|#| |B|#",
+		" | |#| | | |#| |#",
+		"#| | | |#| | | |#",
+		"############ ####"}
+	game := game.Deserialize(rawGame)
+
+	//WHEN
+	moves := ai.GetNextMoves(game)
+
+	//THEN
+	if len(moves) != 3 {
+		t.Errorf("Analyzer should return just one winning move %v", moves)
+	}
+	rightWin := moves["right"]
+	downRightWin := moves["down:right"]
+	leftRightWin := moves["left:right"]
+	if rightWin || downRightWin || leftRightWin {
+		t.Errorf("The losing move should be 'right' %v", moves)
+	}
+}
+
+//one blue out in 2 moves
+func TestMoveToUpRightShouldBePartOfTheWinsWhenLastBlueIsOneCellNearExit(t *testing.T) {
+
+	//GIVEN
+	rawGame := []string{"blue",
+		"#### ############",
+		"#| | | |#| | | |#",
+		"#| |#|B| |B|#|R| ",
+		"#| | |#| |#| |b|#",
+		"#|#|R|B|r|B| |#|#",
+		"#| |R|#|x|#| | |#",
+		" | |#| |r| |#| |#",
+		"#| | | |#|B|r| |#",
+		"############ ####"}
+	game := game.Deserialize(rawGame)
+
+	//WHEN
+	moves := ai.GetNextMoves(game)
+
+	//THEN
+	upRightWin := moves["up:right"]
+	if !upRightWin {
+		t.Errorf("The winning move should be 'right' %v", moves)
+	}
+}
+
+//two blue out in 2 moves
+//one blue one red out => should not win
+//black out in one move
+//black out in one two move
+//black out and red out in two move
 func loadGame(filePath string) game.Game {
 	file, err := os.Open(filePath)
 	if err != nil {
