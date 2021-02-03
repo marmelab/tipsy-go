@@ -31,10 +31,10 @@ func Deserialize(gameString []string) Game {
 	deserializedGame.CurrentPlayer = gameString[0]
 	fmt.Println(gameString[1])
 	for rowIndex, line := range gameString[2 : BoardSize+2] {
+		fmt.Println(strings.Replace(line, "|", " ", -1))
 		characters := strings.Split(line, "|")
 
 		for colIndex, char := range characters[1:] {
-			fmt.Print(char + "|")
 			position := [2]int{colIndex, rowIndex}
 			switch char {
 			case "r":
@@ -49,7 +49,6 @@ func Deserialize(gameString []string) Game {
 				deserializedGame.Pucks[tools.GetKeyFromPosition(position)] = Puck{Color: BLACK}
 			}
 		}
-		fmt.Println()
 	}
 	if len(gameString) == BoardSize+4 {
 		for _, char := range strings.Split(gameString[10], "|") {

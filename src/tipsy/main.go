@@ -17,9 +17,14 @@ func main() {
 	}
 	byteValue, _ := ioutil.ReadAll(file)
 
-	var game game.Game
+	var rawGame []string
 
-	json.Unmarshal(byteValue, &game)
+	json.Unmarshal(byteValue, &rawGame)
 
-	fmt.Println(ai.GetWinner(game))
+	game := game.Deserialize(rawGame)
+
+	moves := ai.GetNextMoves(game)
+
+	fmt.Printf("%v", moves)
+
 }
