@@ -50,10 +50,10 @@ func initEdges(board *Board) {
 		var leftPosition = [2]int{node.Position[0] - 1, node.Position[1]}
 		var upPosition = [2]int{node.Position[0], node.Position[1] - 1}
 		var downPosition = [2]int{node.Position[0], node.Position[1] + 1}
-		addEdge(node, leftPosition, "left", board)
-		addEdge(node, rightPosition, "right", board)
-		addEdge(node, upPosition, "up", board)
-		addEdge(node, downPosition, "down", board)
+		addEdge(node, leftPosition, LEFT, board)
+		addEdge(node, rightPosition, RIGHT, board)
+		addEdge(node, upPosition, UP, board)
+		addEdge(node, downPosition, DOWN, board)
 	}
 }
 
@@ -179,6 +179,6 @@ func Tilt(game Game, board *Board, direction string) Game {
 		gameFallenPucks = append(gameFallenPucks, fallenPucks...)
 	}
 	game.Pucks = gamePucks
-	game.FallenPucks = gameFallenPucks
+	game.FallenPucks = append(game.FallenPucks, gameFallenPucks...)
 	return game
 }
