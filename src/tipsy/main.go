@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 	"tipsy/ai"
 	"tipsy/game"
 )
@@ -31,6 +32,14 @@ func main() {
 	json.Unmarshal(byteValue, &rawGame)
 
 	currentGame := game.Deserialize(rawGame)
-	bestMove := ai.GetNextMovesScores(currentGame, minMaxDepth, *verbose)
+
+	start := time.Now()
+	bestMove, movesScore := ai.GetNextMovesScores(currentGame, minMaxDepth, *verbose)
+	elapsed := time.Since(start)
+	for move, moveScore := range movesScore {
+		fmt.Printf("- %v => %v\n", move, moveScore)
+	}
+	fmt.Println()
+	fmt.Printf("Found in %v\n\n", elapsed)
 	fmt.Printf("Best Move : %v", bestMove)
 }

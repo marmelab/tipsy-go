@@ -9,7 +9,6 @@ import (
 	"tipsy/game"
 )
 
-
 //last blue out in 1 move
 func TestMoveToEastShouldBePartOfTheWinsWhenLastBlueNearExit(t *testing.T) {
 
@@ -27,14 +26,20 @@ func TestMoveToEastShouldBePartOfTheWinsWhenLastBlueNearExit(t *testing.T) {
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	moves := ai.GetNextMovesScores(currentGame, 2, true)
+	moves := ai.GetNextMovesScores(currentGame, 3, true)
 
 	//THEN
 	rightWin := moves[game.RIGHT]
 	downRightWin := moves["down:right"]
 	leftRightWin := moves["left:right"]
-	if !(rightWin == ai.WinningScore) || !(downRightWin == ai.WinningScore) || !(leftRightWin == ai.WinningScore) {
+	if !(rightWin == ai.WinningScore) {
 		t.Errorf("The winning move should be 'right' %v", moves)
+	}
+	if !(downRightWin == ai.WinningScore) {
+		t.Errorf("The winning move should be 'down:right' %v", moves)
+	}
+	if !(leftRightWin == ai.WinningScore) {
+		t.Errorf("The winning move should be 'left:right' %v", moves)
 	}
 }
 
@@ -135,7 +140,7 @@ func TestMoveToDownRightShouldBeTheBestMove(t *testing.T) {
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	bestMoves := ai.GetNextMovesScores(currentGame, 2, true)
+	bestMoves := ai.GetNextMovesScores(currentGame, 1, true)
 
 	//THEN
 
@@ -191,7 +196,7 @@ func TestMoveToDownRightShouldBeTheBestMoveAsItPushOutLastBluePucks(t *testing.T
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	bestMoves := ai.GetNextMovesScores(currentGame, 2, true)
+	bestMoves := ai.GetNextMovesScores(currentGame, 1, true)
 
 	//THEN
 

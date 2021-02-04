@@ -1,8 +1,6 @@
 package game
 
-import (
-	"tipsy/tools"
-)
+import "tipsy/tools"
 
 const (
 	//BoardSize the size of the board
@@ -170,9 +168,10 @@ func movePuckTo(puckKey string, currentPuck Puck,
 //Tilt the game in a given direction
 func Tilt(game Game, board *Board, direction string) Game {
 	gamePucks := make(map[string]Puck)
+	currentGamePucks := cloneMap(game.Pucks)
 	var gameFallenPucks []Puck
-	for key, puck := range game.Pucks {
-		movedPucks, fallenPucks := movePuckTo(key, puck, game.Pucks, board, direction)
+	for key, puck := range currentGamePucks {
+		movedPucks, fallenPucks := movePuckTo(key, puck, currentGamePucks, board, direction)
 		for key, puck := range movedPucks {
 			gamePucks[key] = puck
 		}
@@ -181,4 +180,12 @@ func Tilt(game Game, board *Board, direction string) Game {
 	game.Pucks = gamePucks
 	game.FallenPucks = append(game.FallenPucks, gameFallenPucks...)
 	return game
+}
+
+func cloneMap(original map[string]Puck) map[string]Puck {
+	target := make(map[string]Puck)
+	for key, value := range original {
+		target[key] = value
+	}
+	return target
 }

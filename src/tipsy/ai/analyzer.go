@@ -2,40 +2,42 @@ package ai
 
 import (
 	"fmt"
+	"sync"
 	"tipsy/game"
 )
 
+//MovementScore tuple of movement with its score
+type MovementScore struct {
+	movement string
+	score    int
+}
+
 //GetNextMovesScores evaluate each move to find which win or not
-func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) map[string]int {
+func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string, map[string]int) {
+
 	moves := make(map[string]int)
+	movesChannel := make(chan MovementScore, 50)
+	var wg sync.WaitGroup
 	board := game.NewBoard()
 	for _, firstDirection := range game.Directions {
-		if verbose {
-			fmt.Printf("%v", firstDirection)
-		}
 		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
 		score := GetScore(firstMoveGame)
 		if score != WinningScore && score != LosingScore {
 			if verbose {
 				fmt.Println()
 			}
+
 			for _, secondDirection := range game.Directions {
-				if verbose {
-					fmt.Printf("|-- %v", secondDirection)
-				}
-				var scoreChannel chan int = make(chan int)
-				secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
-				go MinMax(secondMoveGame, depth, false, false, scoreChannel)
-				score := <-scoreChannel
+				wg.Add(1)
+				go func(movesChannel chan<- MovementScore, firstDirection, secondDirection string, wg *sync.WaitGroup) {
 
-				if verbose {
-					fmt.Printf(" => %v", score)
-				}
-				moves[firstDirection+":"+secondDirection] = score
-
-				if verbose {
-					fmt.Println()
-				}
+					secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
+					score := MinMax(secondMoveGame, depth, false, false)
+					movesChannel <- MovementScore{
+						movement: firstDirection + ":" + secondDirection,
+						score:    score}
+					wg.Done()
+				}(movesChannel, firstDirection, secondDirection, &wg)
 			}
 		} else {
 			if verbose {
@@ -44,5 +46,20 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) map[stri
 			moves[firstDirection] = score
 		}
 	}
-	return moves
+	wg.Wait()
+	close(movesChannel)
+	bestMove := ""
+	bestScore := -9999999
+	for moveScore := range movesChannel {
+		moves[moveScore.movement] = moveScore.score
+		if moveScore.score > bestScore {
+			bestScore = moveScore.score
+			bestMove = moveScore.movement
+		}
+		if verbose {
+			fmt.Printf(" %v => %v", moveScore.movement, moveScore.score)
+			fmt.Println()
+		}
+	}
+	return bestMove, moves
 }
