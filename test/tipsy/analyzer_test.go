@@ -308,11 +308,11 @@ func TestBestMoveShouldBeToMoveBlackFarOfTheExit(t *testing.T) {
 	rawGame := []string{"blue",
 		"#### ############",
 		"#| | | |#| | |x|#",
-		"#| |#|b| |b|#| | ",
-		"#| |r|#|r|#|r| |#",
-		"#|#| |b| |b| |#|#",
-		"#| |r|#|r|#|r| |#",
-		" | |#|b| |b|#| |#",
+		"#| |#| | | |#| | ",
+		"#| | |#| |#| | |#",
+		"#|#| | | | | |#|#",
+		"#| | |#| |#| | |#",
+		" | |#| | | |#| |#",
 		"#| | | |#| | | |#",
 		"############ ####"}
 	game := game.Deserialize(rawGame)
@@ -323,8 +323,8 @@ func TestBestMoveShouldBeToMoveBlackFarOfTheExit(t *testing.T) {
 	//THEN
 	leftDown := moves["left:down"]
 
-	if leftDown != -750 {
-		t.Errorf("Best move should be 'up:right' %v", moves)
+	if leftDown != -400 {
+		t.Errorf("Best move should be 'left:down' %v", moves)
 	}
 }
 
@@ -345,12 +345,13 @@ func TestMoveToDownRightShouldBeTheBestMove(t *testing.T) {
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	_, bestMove := ai.MinMax(currentGame, 3, true, false)
+	bestMoves := ai.GetNextMovesScores(currentGame, true)
 
 	//THEN
 
-	if !(bestMove == "down:right") {
-		t.Errorf("The winning move should be 'down:right' %v", bestMove)
+	downRight := bestMoves["down:right"]
+	if downRight != ai.WinningScore {
+		t.Errorf("The winning move should be 'down:right' %v", bestMoves)
 	}
 }
 

@@ -24,7 +24,7 @@ func GetNextMovesScores(currentGame game.Game, verbose bool) map[string]int {
 					fmt.Printf("|-- %v", secondDirection)
 				}
 				secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
-				score := GetScore(secondMoveGame)
+				score := MinMax(secondMoveGame, 2, false, false)
 
 				if verbose {
 					fmt.Printf(" => %v", score)
@@ -43,52 +43,4 @@ func GetNextMovesScores(currentGame game.Game, verbose bool) map[string]int {
 		}
 	}
 	return moves
-}
-
-//MinMax evaluate best move giving a depth and a starting game
-func MinMax(currentGame game.Game, depth int, maximizingPlayer bool, verbose bool) (int, string) {
-	if depth == 0 {
-		return GetScore(currentGame), "None"
-	}
-	board := game.NewBoard()
-	if maximizingPlayer {
-		value := -9999999
-		directions := "None"
-		for _, firstDirection := range game.Directions {
-			for _, secondDirection := range game.Directions {
-				if verbose {
-					fmt.Printf("Exploring %v %v\n", firstDirection, secondDirection)
-				}
-				nextGame := game.Tilt(currentGame, &board, firstDirection)
-				nextGame = game.Tilt(nextGame, &board, secondDirection)
-				// nextGame = game.SwitchPlayer(nextGame)
-				// nextGame = game.ReplacePucks(nextGame)
-				nextGameScore, _ := MinMax(nextGame, depth-1, false, verbose)
-				if nextGameScore > value {
-					value = nextGameScore
-					directions = firstDirection + ":" + secondDirection
-				}
-			}
-		}
-		return value, directions
-	}
-
-	value := 9999999
-	directions := "None"
-	for _, firstDirection := range game.Directions {
-		for _, secondDirection := range game.Directions {
-			nextGame := game.Tilt(currentGame, &board, firstDirection)
-			nextGame = game.Tilt(nextGame, &board, secondDirection)
-			// nextGame = game.SwitchPlayer(nextGame)
-			// nextGame = game.ReplacePucks(nextGame)
-			nextGameScore, _ := MinMax(nextGame, depth-1, true, verbose)
-
-			if nextGameScore < value {
-				value = nextGameScore
-				directions = firstDirection + ":" + secondDirection
-			}
-		}
-	}
-	return value, directions
-
 }

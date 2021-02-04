@@ -1,6 +1,9 @@
 package ai
 
-import "tipsy/game"
+import (
+	"fmt"
+	"tipsy/game"
+)
 
 const (
 	//NeutralScore The neutral score
@@ -125,4 +128,59 @@ func getAskingPlayerScore(winningPlayer string, askingPlayer string) int {
 		return WinningScore
 	}
 	return LosingScore
+}
+
+//MinMax evaluate best move giving a depth and a starting game
+func MinMax(currentGame game.Game, depth int, maximizingPlayer bool, verbose bool) int {
+	if depth == 0 {
+		return GetScore(currentGame)
+	}
+	board := game.NewBoard()
+	if maximizingPlayer {
+		value := -9999999
+		for _, firstDirection := range game.Directions {
+			for _, secondDirection := range game.Directions {
+				// nextGame = game.ReplacePucks(nextGame)
+				nextGame := game.Tilt(currentGame, &board, firstDirection)
+				nextGame = game.Tilt(nextGame, &board, secondDirection)
+				nextGame = game.SwitchPlayer(currentGame)
+				nextGameScore := MinMax(nextGame, depth-1, false, verbose)
+				if verbose {
+					//depth 4 => 0 (4-4)
+					//depth 3 => 1 (4-3)
+					for i := 0; i < 4-depth; i++ {
+						fmt.Print("\t")
+					}
+					fmt.Printf("Exploring %v %v => %v\n", firstDirection, secondDirection, nextGameScore)
+				}
+				if nextGameScore > value {
+					value = nextGameScore
+				}
+			}
+		}
+		return value
+	}
+
+	value := 9999999
+	for _, firstDirection := range game.Directions {
+		for _, secondDirection := range game.Directions {
+			// nextGame = game.ReplacePucks(nextGame)
+			nextGame := game.Tilt(currentGame, &board, firstDirection)
+			nextGame = game.Tilt(nextGame, &board, secondDirection)
+			nextGame = game.SwitchPlayer(currentGame)
+			nextGameScore := MinMax(nextGame, depth-1, true, verbose)
+
+			if verbose {
+				for i := 0; i < 4-depth; i++ {
+					fmt.Print("\t")
+				}
+				fmt.Printf("Exploring %v %v => %v\n", firstDirection, secondDirection, nextGameScore)
+			}
+			if nextGameScore < value {
+				value = nextGameScore
+			}
+		}
+	}
+	return value
+
 }
