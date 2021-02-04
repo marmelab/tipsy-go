@@ -85,7 +85,5 @@ func Deserialize(gameString []string) Game {
 		}
 	}
 	fmt.Println(gameString[BoardSize+2])
-	fmt.Println()
-	fmt.Println()
 	return deserializedGame
 }

@@ -15,22 +15,18 @@ type MovementScore struct {
 //GetNextMovesScores evaluate each move to find which win or not
 func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string, map[string]int) {
 
+	var wg sync.WaitGroup
 	moves := make(map[string]int)
 	movesChannel := make(chan MovementScore, 50)
-	var wg sync.WaitGroup
 	board := game.NewBoard()
 	for _, firstDirection := range game.Directions {
 		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
 		score := GetScore(firstMoveGame)
 		if score != WinningScore && score != LosingScore {
-			if verbose {
-				fmt.Println()
-			}
-
 			for _, secondDirection := range game.Directions {
 				wg.Add(1)
 				go func(movesChannel chan<- MovementScore, firstDirection, secondDirection string, wg *sync.WaitGroup) {
-
+					fmt.Printf("exploring %v\n", firstDirection+":"+secondDirection)
 					secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
 					score := MinMax(secondMoveGame, depth, false, false)
 					movesChannel <- MovementScore{
@@ -39,14 +35,11 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 					wg.Done()
 				}(movesChannel, firstDirection, secondDirection, &wg)
 			}
+			wg.Wait()
 		} else {
-			if verbose {
-				fmt.Printf(" => %v\n", score)
-			}
 			moves[firstDirection] = score
 		}
 	}
-	wg.Wait()
 	close(movesChannel)
 	bestMove := ""
 	bestScore := -9999999
