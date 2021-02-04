@@ -179,6 +179,6 @@ func Tilt(game Game, board *Board, direction string) Game {
 		gameFallenPucks = append(gameFallenPucks, fallenPucks...)
 	}
 	game.Pucks = gamePucks
-	game.FallenPucks = gameFallenPucks
+	game.FallenPucks = append(game.FallenPucks, gameFallenPucks...)
 	return game
 }

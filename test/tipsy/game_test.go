@@ -266,3 +266,37 @@ func TestPuckShouldFallWhenNextToAnExitAndTiltTowardIt(t *testing.T) {
 		t.Errorf("Blue Puck should have Fall %v", currentGame)
 	}
 }
+
+//two blue out in 2 moves
+func TestMoveToDownRightShouldPushOutLastBluePucks(t *testing.T) {
+
+	//GIVEN
+	rawGame := []string{"blue",
+		"#### ############",
+		"#| | | |#| | |b|#",
+		"#| |#| |B| |#|R| ",
+		"#| |R|#|R|#|B| |#",
+		"#|#|R| |R|B| |#|#",
+		"#| | |#| |#| |B|#",
+		" | |#| | |r|#| |#",
+		"#| | | |#| |b| |#",
+		"############ ####"}
+
+	currentGame := game.Deserialize(rawGame)
+	board := game.NewBoard()
+
+	//WHEN
+	currentGame = game.Tilt(currentGame, &board, game.DOWN)
+	currentGame = game.Tilt(currentGame, &board, game.RIGHT)
+
+	//THEN
+
+	if len(currentGame.FallenPucks) != 2 {
+		t.Errorf("Two Pucks should have Fall %v", currentGame.FallenPucks)
+	}
+	for _, fallenPuck := range currentGame.FallenPucks {
+		if !(fallenPuck.Color == game.BLUE) {
+			t.Errorf("Fallen Pucks should be blue Fall %v", currentGame.FallenPucks)
+		}
+	}
+}

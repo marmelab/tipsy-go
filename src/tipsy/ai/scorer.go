@@ -111,13 +111,6 @@ func getActiveScore(currentGame game.Game) int {
 			default:
 				score -= heatMap[key]
 			}
-		} else {
-			switch puck.Color {
-			case currentGame.CurrentPlayer:
-				score += flippedPuckScore
-			default:
-				score -= flippedPuckScore
-			}
 		}
 	}
 	return score
@@ -132,8 +125,9 @@ func getAskingPlayerScore(winningPlayer string, askingPlayer string) int {
 
 //MinMax evaluate best move giving a depth and a starting game
 func MinMax(currentGame game.Game, depth int, maximizingPlayer bool, verbose bool) int {
-	if depth == 0 {
-		return GetScore(currentGame)
+	currentGameScore := GetScore(currentGame)
+	if depth == 0 || currentGameScore == WinningScore || currentGameScore == LosingScore {
+		return currentGameScore
 	}
 	board := game.NewBoard()
 	if maximizingPlayer {

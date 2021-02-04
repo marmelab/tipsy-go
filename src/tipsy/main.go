@@ -10,6 +10,10 @@ import (
 	"tipsy/game"
 )
 
+const (
+	minMaxDepth = 2
+)
+
 func main() {
 	inputFilePath := flag.String("file",
 		"./test/tipsy/dataset/active.json",
@@ -27,6 +31,6 @@ func main() {
 	json.Unmarshal(byteValue, &rawGame)
 
 	currentGame := game.Deserialize(rawGame)
-	bestMove := ai.GetNextMovesScores(currentGame, *verbose)
+	bestMove := ai.GetNextMovesScores(currentGame, minMaxDepth, *verbose)
 	fmt.Printf("Best Move : %v", bestMove)
 }
