@@ -124,10 +124,11 @@ func getAskingPlayerScore(winningPlayer string, askingPlayer string) int {
 }
 
 //MinMax evaluate best move giving a depth and a starting game
-func MinMax(currentGame game.Game, depth int, maximizingPlayer bool, verbose bool) int {
+func MinMax(inputGame game.Game, depth int, maximizingPlayer bool, verbose bool, score chan int) int {
+	currentGame := inputGame
 	currentGameScore := GetScore(currentGame)
 	if depth == 0 || currentGameScore == WinningScore || currentGameScore == LosingScore {
-		return currentGameScore
+		score <- currentGameScore
 	}
 	board := game.NewBoard()
 	if maximizingPlayer {
@@ -138,10 +139,9 @@ func MinMax(currentGame game.Game, depth int, maximizingPlayer bool, verbose boo
 				nextGame := game.Tilt(currentGame, &board, firstDirection)
 				nextGame = game.Tilt(nextGame, &board, secondDirection)
 				nextGame = game.SwitchPlayer(currentGame)
-				nextGameScore := MinMax(nextGame, depth-1, false, verbose)
+				go MinMax(nextGame, depth-1, false, verbose, score)
+				nextGameScore := <-score
 				if verbose {
-					//depth 4 => 0 (4-4)
-					//depth 3 => 1 (4-3)
 					for i := 0; i < 4-depth; i++ {
 						fmt.Print("\t")
 					}
@@ -162,7 +162,8 @@ func MinMax(currentGame game.Game, depth int, maximizingPlayer bool, verbose boo
 			nextGame := game.Tilt(currentGame, &board, firstDirection)
 			nextGame = game.Tilt(nextGame, &board, secondDirection)
 			nextGame = game.SwitchPlayer(currentGame)
-			nextGameScore := MinMax(nextGame, depth-1, true, verbose)
+			go MinMax(nextGame, depth-1, true, verbose, score)
+			nextGameScore := <-score
 
 			if verbose {
 				for i := 0; i < 4-depth; i++ {

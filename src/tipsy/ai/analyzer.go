@@ -23,8 +23,10 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) map[stri
 				if verbose {
 					fmt.Printf("|-- %v", secondDirection)
 				}
+				var scoreChannel chan int = make(chan int)
 				secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
-				score := MinMax(secondMoveGame, depth, false, false)
+				go MinMax(secondMoveGame, depth, false, false, scoreChannel)
+				score := <-scoreChannel
 
 				if verbose {
 					fmt.Printf(" => %v", score)

@@ -191,7 +191,7 @@ func TestMoveToDownRightShouldBeTheBestMoveAsItPushOutLastBluePucks(t *testing.T
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	bestMoves := ai.GetNextMovesScores(currentGame, 1, true)
+	bestMoves := ai.GetNextMovesScores(currentGame, 2, true)
 
 	//THEN
 
