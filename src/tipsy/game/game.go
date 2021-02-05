@@ -31,8 +31,8 @@ var Directions = [4]string{RIGHT, LEFT, UP, DOWN}
 //Game the game state
 type Game struct {
 	Pucks         map[string]Puck `json:"pucks"`
-	FallenPucks   []Puck
-	CurrentPlayer string `json:"currentPlayer"`
+	FallenPucks   []Puck          `json:"fallenPucks"`
+	CurrentPlayer string          `json:"currentPlayer"`
 }
 
 //SwitchPlayer return the opposite of currentPlayer
@@ -72,15 +72,17 @@ func Deserialize(gameString []string) Game {
 			}
 		}
 	}
+
+	// {1, -1}, {7, 1}, {-1, 5}, {5, 7}}
 	if len(gameString) == BoardSize+4 {
 		for _, char := range strings.Split(gameString[10], "|") {
 			switch char {
 			case "r":
-				deserializedGame.FallenPucks = append(deserializedGame.FallenPucks, Puck{Color: RED})
+				deserializedGame.FallenPucks = append(deserializedGame.FallenPucks, Puck{Color: RED, Position: "1:0"})
 			case "b":
-				deserializedGame.FallenPucks = append(deserializedGame.FallenPucks, Puck{Color: BLUE})
+				deserializedGame.FallenPucks = append(deserializedGame.FallenPucks, Puck{Color: BLUE, Position: "6:0"})
 			case "x":
-				deserializedGame.FallenPucks = append(deserializedGame.FallenPucks, Puck{Color: BLACK})
+				deserializedGame.FallenPucks = append(deserializedGame.FallenPucks, Puck{Color: BLACK, Position: "0:5"})
 			}
 		}
 	}
@@ -88,9 +90,20 @@ func Deserialize(gameString []string) Game {
 	return deserializedGame
 }
 
+//ReplacePucks replace fallen pucks
+func ReplacePucks(game Game) Game {
+	resultGame := CloneGame(game)
+	for _, puck := range resultGame.FallenPucks {
+		puck.Flipped = true
+		resultGame.Pucks[puck.Position] = puck
+	}
+	return resultGame
+}
+
+//CloneGame clone game
 func CloneGame(game Game) Game {
 	clonedGame := Game{
-		Pucks:         cloneMap(game.Pucks),
+		Pucks:         CloneMap(game.Pucks),
 		FallenPucks:   game.FallenPucks,
 		CurrentPlayer: game.CurrentPlayer,
 	}

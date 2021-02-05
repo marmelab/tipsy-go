@@ -87,7 +87,8 @@ func getFallenPucks(currentGame game.Game) (int, int, bool) {
 	fallenRedPucks := 0
 	fallenBluePucks := 0
 	fallenBlackPuck := false
-	for _, puck := range currentGame.FallenPucks {
+	gameFallenPucks := currentGame.FallenPucks
+	for _, puck := range gameFallenPucks {
 		switch puck.Color {
 		case game.BLUE:
 			fallenBluePucks++
@@ -137,11 +138,11 @@ func MinMax(inputGame game.Game, depth int, maximizingPlayer bool, verbose bool)
 		var wg sync.WaitGroup
 		scoresChannel := make(chan int, 16)
 		for _, firstDirection := range game.Directions {
-			firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
+			firstMoveGame := game.ReplacePucks(currentGame)
+			firstMoveGame = game.Tilt(currentGame, &board, firstDirection)
 			score := GetScore(firstMoveGame, true)
 			if score != WinningScore && score != LosingScore {
 				for _, secondDirection := range game.Directions {
-					// nextGame = game.ReplacePucks(nextGame)
 					wg.Add(1)
 					go func(secondDirection string, wg *sync.WaitGroup, scoresChannel chan<- int) {
 						defer wg.Done()

@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	minMaxDepth = 3
+	minMaxDepth = 5
 )
 
 func main() {
