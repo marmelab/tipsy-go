@@ -19,6 +19,8 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 	moves := make(map[string]int)
 	movesChannel := make(chan MovementScore, 16)
 	board := game.NewBoard()
+	bestMove := ""
+	bestScore := -9999999
 	for _, firstDirection := range game.Directions {
 		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
 		score := GetScore(firstMoveGame, true)
@@ -38,11 +40,13 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 			wg.Wait()
 		} else {
 			moves[firstDirection] = score
+			if score > bestScore {
+				bestScore = score
+				bestMove = firstDirection
+			}
 		}
 	}
 	close(movesChannel)
-	bestMove := ""
-	bestScore := -9999999
 	for moveScore := range movesChannel {
 		moves[moveScore.movement] = moveScore.score
 		if moveScore.score > bestScore {
