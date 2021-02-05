@@ -20,7 +20,7 @@ func TestRedShouldBeTheWinnerIfAllSixRedPucksAreFlipped(t *testing.T) {
 		"#################"}
 	game := game.Deserialize(rawGame)
 	//WHEN
-	score := ai.GetScore(game)
+	score := ai.GetScore(game,false)
 	//THEN
 	if score != ai.WinningScore {
 		t.Errorf("Winner shoul be red: %v => %v", game, score)
@@ -42,7 +42,7 @@ func TestBlueShouldLoseIfAllSixBluePucksAreFlipped(t *testing.T) {
 		"#################"}
 	currentGame := game.Deserialize(rawGame)
 	//WHEN
-	score := ai.GetScore(currentGame)
+	score := ai.GetScore(currentGame,false)
 	//THEN
 	if score != ai.LosingScore {
 		t.Errorf("Winner should be blue: %v", score)
@@ -64,7 +64,7 @@ func TestShouldBeActiveIfNeitherBlueOrRedHaveSixPucksFlipped(t *testing.T) {
 		"#################"}
 	game := game.Deserialize(rawGame)
 	//WHEN
-	score := ai.GetScore(game)
+	score := ai.GetScore(game,false)
 	//THEN
 	if score == ai.WinningScore || score == ai.LosingScore {
 		t.Errorf("Game should be active: %v ", score)
@@ -87,7 +87,7 @@ func TestBlueShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 		"x"}
 	currentGame := game.Deserialize(rawGame)
 	//WHEN
-	score := ai.GetScore(currentGame)
+	score := ai.GetScore(currentGame,false)
 	//THEN
 	if score != ai.WinningScore {
 		t.Errorf("Blue should win as he pushed the black puck out: %v => %v", currentGame, score)
@@ -111,7 +111,7 @@ func TestRedShouldWinWhenHeJustPushTheBlackPuckOut(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	score := ai.GetScore(game)
+	score := ai.GetScore(game,false)
 
 	//THEN
 	if score != ai.WinningScore {
@@ -136,7 +136,7 @@ func TestRedShouldWinWhenHeJustPushHisLastUnFlippedPuckOut(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	score := ai.GetScore(game)
+	score := ai.GetScore(game,false)
 
 	//THEN
 	if score != ai.WinningScore {
@@ -160,7 +160,7 @@ func TestRedShouldWinWhenHeJustPushHisTwoLastUnFlippedPucksOut(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	score := ai.GetScore(game)
+	score := ai.GetScore(game,false)
 
 	//THEN
 	if score != ai.WinningScore {
@@ -184,7 +184,7 @@ func TestRedShouldLoseWhenRedJustPushLastBlueUnFlippedPucksOut(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	score := ai.GetScore(game)
+	score := ai.GetScore(game,false)
 
 	//THEN
 	if score != ai.LosingScore {
@@ -209,7 +209,7 @@ func TestRedShouldLoseWhenRedJustPushLastBlueAndLastRedUnFlippedPucksOut(t *test
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	score := ai.GetScore(game)
+	score := ai.GetScore(game,false)
 
 	//THEN
 	if score != ai.LosingScore {
