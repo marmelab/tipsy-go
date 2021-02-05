@@ -26,20 +26,24 @@ func TestMoveToEastShouldBePartOfTheWinsWhenLastBlueNearExit(t *testing.T) {
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	_, moves := ai.GetNextMovesScores(currentGame, 3, true)
+	_, moves := ai.GetNextMovesScores(currentGame, 2, true)
 
 	//THEN
-	rightWin := moves[game.RIGHT]
-	downRightWin := moves["down:right"]
-	leftRightWin := moves["left:right"]
-	if !(rightWin == ai.WinningScore) {
-		t.Errorf("The winning move should be 'right' %v", moves)
+	rightLeftWin := moves["right:left"]
+	rightDownWin := moves["right:down"]
+	rightRightWin := moves["right:right"]
+	rightUpWin := moves["right:up"]
+	if rightLeftWin != ai.WinningScore {
+		t.Errorf("The rightLeftWin move score should be WinningScore %v", moves)
 	}
-	if !(downRightWin == ai.WinningScore) {
-		t.Errorf("The winning move should be 'down:right' %v", moves)
+	if rightDownWin != ai.WinningScore {
+		t.Errorf("The rightDownWin move score should be WinningScore %v", moves)
 	}
-	if !(leftRightWin == ai.WinningScore) {
-		t.Errorf("The winning move should be 'left:right' %v", moves)
+	if rightRightWin != ai.WinningScore {
+		t.Errorf("The rightRightWin move score should be WinningScore %v", moves)
+	}
+	if rightUpWin != ai.WinningScore {
+		t.Errorf("The rightUpWin move score should be WinningScore %v", moves)
 	}
 }
 
@@ -63,18 +67,21 @@ func TestMoveToEastShouldBePartOfTheLoseWhenLastBlueNearExit(t *testing.T) {
 	_, moves := ai.GetNextMovesScores(currentGame, 2, true)
 
 	//THEN
-	rightMove := moves[game.RIGHT]
-	downRightMove := moves["down:right"]
-	leftRightMove := moves["left:right"]
-	if rightMove != ai.LosingScore {
-		t.Errorf("The losing move should be 'right' %v", moves)
+	rightLeftWin := moves["right:left"]
+	rightDownWin := moves["right:down"]
+	rightRightWin := moves["right:right"]
+	rightUpWin := moves["right:up"]
+	if rightLeftWin != ai.LosingScore {
+		t.Errorf("The rightLeftWin move score should be LosingScore %v", moves)
 	}
-	if downRightMove != ai.LosingScore {
-		t.Errorf("The downRight Score should not be Losing %v", moves)
+	if rightDownWin != ai.LosingScore {
+		t.Errorf("The rightDownWin move score should be LosingScore %v", moves)
 	}
-	if leftRightMove != ai.LosingScore {
-		t.Errorf("The leftRightDownRight Score should not be Losing %v", moves)
-
+	if rightRightWin != ai.LosingScore {
+		t.Errorf("The rightRightWin move score should be LosingScore %v", moves)
+	}
+	if rightUpWin != ai.LosingScore {
+		t.Errorf("The rightUpWin move score should be LosingScore %v", moves)
 	}
 }
 
@@ -160,7 +167,7 @@ func TestMoveToDownRightShouldBeTheBestMove(t *testing.T) {
 }
 
 //one blue one red out => should not win
-func TestMoveToDownRightShouldntBeTheBestMove(t *testing.T) {
+func TestMoveToDownShouldBeALosingMoveAsItExitRedPuck(t *testing.T) {
 
 	//GIVEN
 	rawGame := []string{"blue",
@@ -177,16 +184,25 @@ func TestMoveToDownRightShouldntBeTheBestMove(t *testing.T) {
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	bestMove, bestMoves := ai.GetNextMovesScores(currentGame, 2, true)
+	_, bestMoves := ai.GetNextMovesScores(currentGame, 2, true)
 
 	//THEN
 
 	downRight := bestMoves["down:right"]
-	if downRight == ai.WinningScore {
-		t.Errorf("The winning move should not be 'down:right' %v", bestMoves)
+	downLeft := bestMoves["down:left"]
+	downUp := bestMoves["down:up"]
+	downDown := bestMoves["down:down"]
+	if downRight != ai.LosingScore {
+		t.Errorf("The 'down:right' move should have LosingScore %v", bestMoves)
 	}
-	if bestMove == "down:right" {
-		t.Errorf("The winning move should not be 'down:right' %v", bestMoves)
+	if downLeft != ai.LosingScore {
+		t.Errorf("The 'down:left' move should have LosingScore %v", bestMoves)
+	}
+	if downUp != ai.LosingScore {
+		t.Errorf("The 'down:up' move should have LosingScore %v", bestMoves)
+	}
+	if downDown != ai.LosingScore {
+		t.Errorf("The 'down:down' move should have LosingScore %v", bestMoves)
 	}
 }
 
@@ -222,6 +238,36 @@ func TestMoveToDownRightShouldBeTheBestMoveAsItPushOutLastBluePucks(t *testing.T
 }
 
 //black out in one move
+func TestMoveToDownRightShouldBeTheBestMoveAsItPushOutTheBlackPuck(t *testing.T) {
+
+	//GIVEN
+	rawGame := []string{"blue",
+		"#### ############",
+		"#| | | |#| | |x|#",
+		"#| |#| |B| |#|R| ",
+		"#| |R|#|R|#|B| |#",
+		"#|#|R| |R|B| |#|#",
+		"#| | |#| |#| |B|#",
+		" | |#| | | |#| |#",
+		"#| | | |#|b|r| |#",
+		"############ ####"}
+
+	currentGame := game.Deserialize(rawGame)
+
+	//WHEN
+	bestMove, bestMoves := ai.GetNextMovesScores(currentGame, 1, true)
+
+	//THEN
+
+	downRight := bestMoves["down:right"]
+	if downRight != ai.WinningScore {
+		t.Errorf("The 'down:right' move should have the winning score %v", bestMoves)
+	}
+	if bestMove != "down:right" {
+		t.Errorf("The best move should be 'down:right' %v", bestMoves)
+	}
+}
+
 //black out in one two move
 //black out and red out in two move
 func loadGame(filePath string) game.Game {

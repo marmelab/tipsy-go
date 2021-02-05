@@ -32,7 +32,7 @@ var heatMap = map[string]int{
 	"6:0": twoHops, "6:1": oneHop, "6:2": twoHops, "6:4": threeHops, "6:5": threeHops, "6:6": twoHops}
 
 //GetScore return the winner of the game, or active if no winner yet
-func GetScore(currentGame game.Game) int {
+func GetScore(currentGame game.Game, remainingTurns bool) int {
 
 	fallenRedPucks, fallenBluePucks, fallenBlackPuck := getFallenPucks(currentGame)
 	flippedRedPuck, flippedBluePuck := getFlippedPucks(currentGame)
@@ -41,25 +41,25 @@ func GetScore(currentGame game.Game) int {
 		return WinningScore
 	}
 	if flippedRedPuck == numberOfPuck {
-		return getAskingPlayerScore(game.RED, currentGame.CurrentPlayer)
+		return getCurrentPlayerWinOrLoseScore(game.RED, currentGame.CurrentPlayer)
 	}
 	if flippedBluePuck == numberOfPuck {
-		return getAskingPlayerScore(game.BLUE, currentGame.CurrentPlayer)
+		return getCurrentPlayerWinOrLoseScore(game.BLUE, currentGame.CurrentPlayer)
 	}
-	if currentGame.CurrentPlayer == game.BLUE {
+	if currentGame.CurrentPlayer == game.BLUE && !remainingTurns {
 		if flippedRedPuck+fallenRedPucks == numberOfPuck {
-			return getAskingPlayerScore(game.RED, currentGame.CurrentPlayer)
+			return getCurrentPlayerWinOrLoseScore(game.RED, currentGame.CurrentPlayer)
 		}
 		if flippedBluePuck+fallenBluePucks == numberOfPuck {
-			return getAskingPlayerScore(game.BLUE, currentGame.CurrentPlayer)
+			return getCurrentPlayerWinOrLoseScore(game.BLUE, currentGame.CurrentPlayer)
 		}
 	}
-	if currentGame.CurrentPlayer == game.RED {
+	if currentGame.CurrentPlayer == game.RED && !remainingTurns {
 		if flippedBluePuck+fallenBluePucks == numberOfPuck {
-			return getAskingPlayerScore(game.BLUE, currentGame.CurrentPlayer)
+			return getCurrentPlayerWinOrLoseScore(game.BLUE, currentGame.CurrentPlayer)
 		}
 		if flippedRedPuck+fallenRedPucks == numberOfPuck {
-			return getAskingPlayerScore(game.RED, currentGame.CurrentPlayer)
+			return getCurrentPlayerWinOrLoseScore(game.RED, currentGame.CurrentPlayer)
 		}
 	}
 
@@ -116,7 +116,7 @@ func getActiveScore(currentGame game.Game) int {
 	return score
 }
 
-func getAskingPlayerScore(winningPlayer string, askingPlayer string) int {
+func getCurrentPlayerWinOrLoseScore(winningPlayer string, askingPlayer string) int {
 	if winningPlayer == askingPlayer {
 		return WinningScore
 	}
@@ -126,7 +126,7 @@ func getAskingPlayerScore(winningPlayer string, askingPlayer string) int {
 //MinMax evaluate best move giving a depth and a starting game
 func MinMax(inputGame game.Game, depth int, maximizingPlayer bool, verbose bool) int {
 	currentGame := game.CloneGame(inputGame)
-	currentGameScore := GetScore(currentGame)
+	currentGameScore := GetScore(currentGame, false)
 	if depth == 0 || currentGameScore == WinningScore || currentGameScore == LosingScore {
 		return currentGameScore
 	}

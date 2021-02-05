@@ -21,7 +21,7 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 	board := game.NewBoard()
 	for _, firstDirection := range game.Directions {
 		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
-		score := GetScore(firstMoveGame)
+		score := GetScore(firstMoveGame, true)
 		if score != WinningScore && score != LosingScore {
 			for _, secondDirection := range game.Directions {
 				wg.Add(1)
