@@ -25,15 +25,15 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 		if score != WinningScore && score != LosingScore {
 			for _, secondDirection := range game.Directions {
 				wg.Add(1)
-				go func(movesChannel chan<- MovementScore, firstDirection, secondDirection string, wg *sync.WaitGroup) {
+				go func(movesChannel chan<- MovementScore, firstDirection, secondDirection string, firstMoveGame game.Game, wg *sync.WaitGroup) {
 					fmt.Printf("exploring %v\n", firstDirection+":"+secondDirection)
 					secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
-					score := MinMax(secondMoveGame, depth, false, false)
+					var moveScore int = MinMax(secondMoveGame, depth, false, false)
 					movesChannel <- MovementScore{
 						movement: firstDirection + ":" + secondDirection,
-						score:    score}
+						score:    moveScore}
 					wg.Done()
-				}(movesChannel, firstDirection, secondDirection, &wg)
+				}(movesChannel, firstDirection, secondDirection, firstMoveGame, &wg)
 			}
 			wg.Wait()
 		} else {

@@ -125,7 +125,7 @@ func getAskingPlayerScore(winningPlayer string, askingPlayer string) int {
 
 //MinMax evaluate best move giving a depth and a starting game
 func MinMax(inputGame game.Game, depth int, maximizingPlayer bool, verbose bool) int {
-	currentGame := inputGame
+	currentGame := game.CloneGame(inputGame)
 	currentGameScore := GetScore(currentGame)
 	if depth == 0 || currentGameScore == WinningScore || currentGameScore == LosingScore {
 		return currentGameScore

@@ -66,8 +66,15 @@ func TestMoveToEastShouldBePartOfTheLoseWhenLastBlueNearExit(t *testing.T) {
 	rightMove := moves[game.RIGHT]
 	downRightMove := moves["down:right"]
 	leftRightMove := moves["left:right"]
-	if (rightMove != ai.LosingScore) || (downRightMove != ai.LosingScore) || (leftRightMove != ai.LosingScore) {
+	if rightMove != ai.LosingScore {
 		t.Errorf("The losing move should be 'right' %v", moves)
+	}
+	if downRightMove != ai.LosingScore {
+		t.Errorf("The downRight Score should not be Losing %v", moves)
+	}
+	if leftRightMove != ai.LosingScore {
+		t.Errorf("The leftRightDownRight Score should not be Losing %v", moves)
+
 	}
 }
 

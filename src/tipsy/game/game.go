@@ -87,3 +87,12 @@ func Deserialize(gameString []string) Game {
 	fmt.Println(gameString[BoardSize+2])
 	return deserializedGame
 }
+
+func CloneGame(game Game) Game {
+	clonedGame := Game{
+		Pucks:         cloneMap(game.Pucks),
+		FallenPucks:   game.FallenPucks,
+		CurrentPlayer: game.CurrentPlayer,
+	}
+	return clonedGame
+}

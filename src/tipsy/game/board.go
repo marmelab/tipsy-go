@@ -129,13 +129,13 @@ func isExit(position [2]int, board *Board) bool {
 }
 
 func movePuckTo(puckKey string, currentPuck Puck,
-	gamePucks map[string]Puck, board *Board, direction string) (map[string]Puck, []Puck) {
-
-	neighbor := getNeighbor(tools.GetPositionFromKey(puckKey), board, direction)
+	inputGamePucks map[string]Puck, board *Board, direction string) (map[string]Puck, []Puck) {
+	gamePucks := cloneMap(inputGamePucks)
+	neighbors := getNeighbor(tools.GetPositionFromKey(puckKey), board, direction)
 	var nodesWithPuck []Node
-	for isAPuck(neighbor, gamePucks) {
-		nodesWithPuck = append(nodesWithPuck, neighbor)
-		neighbor = getNeighbor(neighbor.Position, board, direction)
+	for isAPuck(neighbors, gamePucks) {
+		nodesWithPuck = append(nodesWithPuck, neighbors)
+		neighbors = getNeighbor(neighbors.Position, board, direction)
 	}
 
 	pucks := make(map[string]Puck)
@@ -166,20 +166,20 @@ func movePuckTo(puckKey string, currentPuck Puck,
 }
 
 //Tilt the game in a given direction
-func Tilt(game Game, board *Board, direction string) Game {
+func Tilt(currentGame Game, board *Board, direction string) Game {
 	gamePucks := make(map[string]Puck)
-	currentGamePucks := cloneMap(game.Pucks)
+	resultGame := CloneGame(currentGame)
 	var gameFallenPucks []Puck
-	for key, puck := range currentGamePucks {
-		movedPucks, fallenPucks := movePuckTo(key, puck, currentGamePucks, board, direction)
+	for key, puck := range resultGame.Pucks {
+		movedPucks, fallenPucks := movePuckTo(key, puck, resultGame.Pucks, board, direction)
 		for key, puck := range movedPucks {
 			gamePucks[key] = puck
 		}
 		gameFallenPucks = append(gameFallenPucks, fallenPucks...)
 	}
-	game.Pucks = gamePucks
-	game.FallenPucks = append(game.FallenPucks, gameFallenPucks...)
-	return game
+	resultGame.Pucks = gamePucks
+	resultGame.FallenPucks = append(resultGame.FallenPucks, gameFallenPucks...)
+	return resultGame
 }
 
 func cloneMap(original map[string]Puck) map[string]Puck {
