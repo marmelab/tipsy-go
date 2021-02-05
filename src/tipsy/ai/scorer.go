@@ -41,25 +41,25 @@ func GetScore(currentGame game.Game, remainingTurns bool) int {
 		return WinningScore
 	}
 	if flippedRedPuck == numberOfPuck {
-		return getCurrentPlayerWinOrLoseScore(game.RED, currentGame.CurrentPlayer)
+		return getCurrentPlayerScore(game.RED, currentGame.CurrentPlayer)
 	}
 	if flippedBluePuck == numberOfPuck {
-		return getCurrentPlayerWinOrLoseScore(game.BLUE, currentGame.CurrentPlayer)
+		return getCurrentPlayerScore(game.BLUE, currentGame.CurrentPlayer)
 	}
 	if currentGame.CurrentPlayer == game.BLUE && !remainingTurns {
 		if flippedRedPuck+fallenRedPucks == numberOfPuck {
-			return getCurrentPlayerWinOrLoseScore(game.RED, currentGame.CurrentPlayer)
+			return getCurrentPlayerScore(game.RED, currentGame.CurrentPlayer)
 		}
 		if flippedBluePuck+fallenBluePucks == numberOfPuck {
-			return getCurrentPlayerWinOrLoseScore(game.BLUE, currentGame.CurrentPlayer)
+			return getCurrentPlayerScore(game.BLUE, currentGame.CurrentPlayer)
 		}
 	}
 	if currentGame.CurrentPlayer == game.RED && !remainingTurns {
 		if flippedBluePuck+fallenBluePucks == numberOfPuck {
-			return getCurrentPlayerWinOrLoseScore(game.BLUE, currentGame.CurrentPlayer)
+			return getCurrentPlayerScore(game.BLUE, currentGame.CurrentPlayer)
 		}
 		if flippedRedPuck+fallenRedPucks == numberOfPuck {
-			return getCurrentPlayerWinOrLoseScore(game.RED, currentGame.CurrentPlayer)
+			return getCurrentPlayerScore(game.RED, currentGame.CurrentPlayer)
 		}
 	}
 
@@ -116,7 +116,7 @@ func getActiveScore(currentGame game.Game) int {
 	return score
 }
 
-func getCurrentPlayerWinOrLoseScore(winningPlayer string, askingPlayer string) int {
+func getCurrentPlayerScore(winningPlayer string, askingPlayer string) int {
 	if winningPlayer == askingPlayer {
 		return WinningScore
 	}
