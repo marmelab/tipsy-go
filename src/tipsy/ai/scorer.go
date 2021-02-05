@@ -2,6 +2,7 @@ package ai
 
 import (
 	"fmt"
+	"sync"
 	"tipsy/game"
 )
 
@@ -132,49 +133,86 @@ func MinMax(inputGame game.Game, depth int, maximizingPlayer bool, verbose bool)
 	}
 	board := game.NewBoard()
 	if maximizingPlayer {
-		value := -9999999
+		bestScore := -9999999
+		var wg sync.WaitGroup
+		scoresChannel := make(chan int, 16)
 		for _, firstDirection := range game.Directions {
-			for _, secondDirection := range game.Directions {
-				// nextGame = game.ReplacePucks(nextGame)
-				nextGame := game.Tilt(currentGame, &board, firstDirection)
-				nextGame = game.Tilt(nextGame, &board, secondDirection)
-				nextGame = game.SwitchPlayer(currentGame)
+			firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
+			score := GetScore(firstMoveGame, true)
+			if score != WinningScore && score != LosingScore {
+				for _, secondDirection := range game.Directions {
+					// nextGame = game.ReplacePucks(nextGame)
+					wg.Add(1)
+					go func(secondDirection string, wg *sync.WaitGroup, scoresChannel chan<- int) {
+						defer wg.Done()
+						firstMoveGame = game.Tilt(firstMoveGame, &board, secondDirection)
+						firstMoveGame = game.SwitchPlayer(currentGame)
 
-				nextGameScore := MinMax(nextGame, depth-1, false, verbose)
-				if verbose {
-					for i := 0; i < 4-depth; i++ {
-						fmt.Print("\t")
-					}
-					fmt.Printf("Exploring %v %v => %v\n", firstDirection, secondDirection, nextGameScore)
+						nextGameScore := MinMax(firstMoveGame, depth-1, false, verbose)
+						if verbose {
+							for i := 0; i < 4-depth; i++ {
+								fmt.Print("\t")
+							}
+							fmt.Printf("Exploring %v %v => %v\n", firstDirection, secondDirection, nextGameScore)
+						}
+						scoresChannel <- nextGameScore
+					}(secondDirection, &wg, scoresChannel)
 				}
-				if nextGameScore > value {
-					value = nextGameScore
+			} else {
+				if score > bestScore {
+					bestScore = score
 				}
 			}
 		}
-		return value
+		wg.Wait()
+		close(scoresChannel)
+		for score := range scoresChannel {
+			if score > bestScore {
+				bestScore = score
+			}
+
+		}
+		return bestScore
 	}
 
-	value := 9999999
+	var wg sync.WaitGroup
+	scoresChannel := make(chan int, 16)
+	bestScore := 9999999
 	for _, firstDirection := range game.Directions {
-		for _, secondDirection := range game.Directions {
-			// nextGame = game.ReplacePucks(nextGame)
-			nextGame := game.Tilt(currentGame, &board, firstDirection)
-			nextGame = game.Tilt(nextGame, &board, secondDirection)
-			nextGame = game.SwitchPlayer(currentGame)
-			nextGameScore := MinMax(nextGame, depth-1, true, verbose)
+		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
+		score := GetScore(firstMoveGame, true)
+		if score != WinningScore && score != LosingScore {
+			for _, secondDirection := range game.Directions {
+				wg.Add(1)
+				go func(secondDirection string, wg *sync.WaitGroup, scoresChannel chan<- int) {
+					defer wg.Done()
+					// nextGame = game.ReplacePucks(nextGame)
+					firstMoveGame = game.Tilt(firstMoveGame, &board, secondDirection)
+					firstMoveGame = game.SwitchPlayer(currentGame)
+					nextGameScore := MinMax(firstMoveGame, depth-1, true, verbose)
 
-			if verbose {
-				for i := 0; i < 4-depth; i++ {
-					fmt.Print("\t")
-				}
-				fmt.Printf("Exploring %v %v => %v\n", firstDirection, secondDirection, nextGameScore)
+					if verbose {
+						for i := 0; i < 4-depth; i++ {
+							fmt.Print("\t")
+						}
+						fmt.Printf("Exploring %v %v => %v\n", firstDirection, secondDirection, nextGameScore)
+					}
+					scoresChannel <- nextGameScore
+				}(secondDirection, &wg, scoresChannel)
 			}
-			if nextGameScore < value {
-				value = nextGameScore
+		} else {
+			if score < bestScore {
+				bestScore = score
 			}
 		}
 	}
-	return value
+	wg.Wait()
+	close(scoresChannel)
+	for score := range scoresChannel {
+		if score < bestScore {
+			bestScore = score
+		}
+	}
+	return bestScore
 
 }

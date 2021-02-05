@@ -26,18 +26,27 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 		score := GetScore(firstMoveGame, true)
 		if score != WinningScore && score != LosingScore {
 			for _, secondDirection := range game.Directions {
-				wg.Add(1)
-				go func(movesChannel chan<- MovementScore, firstDirection, secondDirection string, firstMoveGame game.Game, wg *sync.WaitGroup) {
-					fmt.Printf("exploring %v\n", firstDirection+":"+secondDirection)
-					secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
-					var moveScore int = MinMax(secondMoveGame, depth, false, false)
-					movesChannel <- MovementScore{
-						movement: firstDirection + ":" + secondDirection,
-						score:    moveScore}
-					wg.Done()
-				}(movesChannel, firstDirection, secondDirection, firstMoveGame, &wg)
+				secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
+				score = GetScore(firstMoveGame, true)
+				if score == WinningScore || score == LosingScore {
+					moves[firstDirection+":"+secondDirection] = score
+					if score > bestScore {
+						bestScore = score
+						bestMove = firstDirection
+					}
+				} else {
+					wg.Add(1)
+					go func(movesChannel chan<- MovementScore, firstDirection, secondDirection string, secondMoveGame game.Game, wg *sync.WaitGroup) {
+						defer wg.Done()
+						fmt.Printf("exploring %v\n", firstDirection+":"+secondDirection)
+						var maxMoveScore int = MinMax(secondMoveGame, depth, false, false)
+						movesChannel <- MovementScore{
+							movement: firstDirection + ":" + secondDirection,
+							score:    maxMoveScore}
+						fmt.Println(firstDirection + ":" + secondDirection + " explored")
+					}(movesChannel, firstDirection, secondDirection, secondMoveGame, &wg)
+				}
 			}
-			wg.Wait()
 		} else {
 			moves[firstDirection] = score
 			if score > bestScore {
@@ -46,6 +55,7 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 			}
 		}
 	}
+	wg.Wait()
 	close(movesChannel)
 	for moveScore := range movesChannel {
 		moves[moveScore.movement] = moveScore.score
