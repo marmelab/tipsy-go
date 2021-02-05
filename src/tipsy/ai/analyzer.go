@@ -17,7 +17,7 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 
 	var wg sync.WaitGroup
 	moves := make(map[string]int)
-	movesChannel := make(chan MovementScore, 50)
+	movesChannel := make(chan MovementScore, 16)
 	board := game.NewBoard()
 	for _, firstDirection := range game.Directions {
 		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
