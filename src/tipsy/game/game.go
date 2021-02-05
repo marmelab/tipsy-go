@@ -35,6 +35,7 @@ type Game struct {
 	CurrentPlayer string `json:"currentPlayer"`
 }
 
+//SwitchPlayer return the opposite of currentPlayer
 func SwitchPlayer(game Game) Game {
 	if game.CurrentPlayer == RED {
 		game.CurrentPlayer = BLUE
@@ -49,6 +50,7 @@ func Deserialize(gameString []string) Game {
 	var deserializedGame Game
 	deserializedGame.Pucks = make(map[string]Puck)
 	deserializedGame.CurrentPlayer = gameString[0]
+	fmt.Println()
 	fmt.Println(gameString[1])
 	for rowIndex, line := range gameString[2 : BoardSize+2] {
 		fmt.Println(strings.Replace(line, "|", " ", -1))
@@ -84,4 +86,13 @@ func Deserialize(gameString []string) Game {
 	}
 	fmt.Println(gameString[BoardSize+2])
 	return deserializedGame
+}
+
+func CloneGame(game Game) Game {
+	clonedGame := Game{
+		Pucks:         cloneMap(game.Pucks),
+		FallenPucks:   game.FallenPucks,
+		CurrentPlayer: game.CurrentPlayer,
+	}
+	return clonedGame
 }

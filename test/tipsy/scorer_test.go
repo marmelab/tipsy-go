@@ -196,7 +196,7 @@ func TestRedShouldLoseWhenRedJustPushLastBlueAndLastRedUnFlippedPucksOut(t *test
 
 	//GIVEN
 	rawGame := []string{"red",
-		"#################",
+		"#### ############",
 		"#| | | |#| | | |#",
 		"#| |#|B| |B|#| | ",
 		"#| |R|#|R|#|R| |#",
