@@ -1,6 +1,7 @@
 package ai
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"tipsy/game"
@@ -21,11 +22,14 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 	board := game.NewBoard()
 	bestMove := ""
 	bestScore := -9999999
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	for _, firstDirection := range game.Directions {
 		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
 		score := GetScore(firstMoveGame, true)
 		if score != WinningScore && score != LosingScore {
 			for _, secondDirection := range game.Directions {
+
 				secondMoveGame := game.Tilt(firstMoveGame, &board, secondDirection)
 				score = GetScore(firstMoveGame, true)
 				if score == WinningScore || score == LosingScore {
@@ -33,18 +37,22 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 					if score > bestScore {
 						bestScore = score
 						bestMove = firstDirection
+						cancel()
 					}
 				} else {
 					wg.Add(1)
-					go func(movesChannel chan<- MovementScore, firstDirection, secondDirection string, secondMoveGame game.Game, wg *sync.WaitGroup) {
+					go func(movesChannel chan<- MovementScore,
+						firstDirection, secondDirection string,
+						secondMoveGame game.Game, wg *sync.WaitGroup,
+						ctx context.Context, cancel context.CancelFunc) {
 						defer wg.Done()
 						fmt.Printf("exploring %v\n", firstDirection+":"+secondDirection)
-						var maxMoveScore int = MinMax(secondMoveGame, depth, false, false)
+						maxMoveScore := MinMax(ctx, secondMoveGame, depth, false, false, cancel)
 						movesChannel <- MovementScore{
 							movement: firstDirection + ":" + secondDirection,
 							score:    maxMoveScore}
 						fmt.Println(firstDirection + ":" + secondDirection + " explored")
-					}(movesChannel, firstDirection, secondDirection, secondMoveGame, &wg)
+					}(movesChannel, firstDirection, secondDirection, secondMoveGame, &wg, ctx, cancel)
 				}
 			}
 		} else {
@@ -52,6 +60,7 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 			if score > bestScore {
 				bestScore = score
 				bestMove = firstDirection
+				cancel()
 			}
 		}
 	}

@@ -90,7 +90,8 @@ func Contains(position [2]int, board *Board) bool {
 	return false
 }
 
-func getNeighbor(position [2]int, board *Board, direction string) Node {
+//Get Neighbor in given direction
+func GetNeighbor(position [2]int, board *Board, direction string) Node {
 	puckNode := getNode(position, board)
 	return getNodeTo(puckNode, board, direction)
 }
@@ -116,7 +117,7 @@ func isAWall(node Node, board *Board) bool {
 }
 
 func getNextFreeCell(position [2]int, gamePucks map[string]Puck, board *Board, direction string) [2]int {
-	neighbor := getNeighbor(position, board, direction)
+	neighbor := GetNeighbor(position, board, direction)
 	if isAPuck(neighbor, gamePucks) || isAWall(neighbor, board) {
 		return position
 	}
@@ -131,11 +132,11 @@ func isExit(position [2]int, board *Board) bool {
 func movePuckTo(puckKey string, currentPuck Puck,
 	inputGamePucks map[string]Puck, board *Board, direction string) (map[string]Puck, map[string]Puck) {
 	gamePucks := CloneMap(inputGamePucks)
-	neighbors := getNeighbor(tools.GetPositionFromKey(puckKey), board, direction)
+	neighbors := GetNeighbor(tools.GetPositionFromKey(puckKey), board, direction)
 	var nodesWithPuck []Node
 	for isAPuck(neighbors, gamePucks) {
 		nodesWithPuck = append(nodesWithPuck, neighbors)
-		neighbors = getNeighbor(neighbors.Position, board, direction)
+		neighbors = GetNeighbor(neighbors.Position, board, direction)
 	}
 
 	pucks := make(map[string]Puck)

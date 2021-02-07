@@ -1,6 +1,7 @@
 package ai
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"tipsy/game"
@@ -31,6 +32,7 @@ var heatMap = map[string]int{
 	"4:0": threeHops, "4:1": fourHops, "4:3": fiveHops, "4:5": threeHops, "4:6": twoHops,
 	"5:0": threeHops, "5:2": threeHops, "5:3": fourHops, "5:4": fourHops, "5:6": oneHop,
 	"6:0": twoHops, "6:1": oneHop, "6:2": twoHops, "6:4": threeHops, "6:5": threeHops, "6:6": twoHops}
+var Counter = 0
 
 //GetScore return the winner of the game, or active if no winner yet
 func GetScore(currentGame game.Game, remainingTurns bool) int {
@@ -126,11 +128,21 @@ func getCurrentPlayerScore(winningPlayer string, askingPlayer string) int {
 }
 
 //MinMax evaluate best move giving a depth and a starting game
-func MinMax(inputGame game.Game, depth int, maximizingPlayer bool, verbose bool) int {
+func MinMax(ctx context.Context, inputGame game.Game, depth int, maximizingPlayer bool, verbose bool, cancel context.CancelFunc) int {
+	Counter++
 	currentGame := game.CloneGame(inputGame)
 	currentGameScore := GetScore(currentGame, false)
-	if depth == 0 || currentGameScore == WinningScore || currentGameScore == LosingScore {
+	if currentGameScore == WinningScore || currentGameScore == LosingScore {
+		cancel()
 		return currentGameScore
+	}
+	if depth == 0 {
+		return currentGameScore
+	}
+	select {
+	case <-ctx.Done():
+		return currentGameScore
+	default:
 	}
 	board := game.NewBoard()
 	if maximizingPlayer {
@@ -138,7 +150,7 @@ func MinMax(inputGame game.Game, depth int, maximizingPlayer bool, verbose bool)
 		var wg sync.WaitGroup
 		scoresChannel := make(chan int, 16)
 		for _, firstDirection := range game.Directions {
-			firstMoveGame := game.ReplacePucks(currentGame)
+			firstMoveGame := game.ReplacePucks(currentGame, &board)
 			firstMoveGame = game.Tilt(currentGame, &board, firstDirection)
 			score := GetScore(firstMoveGame, true)
 			if score != WinningScore && score != LosingScore {
@@ -149,7 +161,7 @@ func MinMax(inputGame game.Game, depth int, maximizingPlayer bool, verbose bool)
 						firstMoveGame = game.Tilt(firstMoveGame, &board, secondDirection)
 						firstMoveGame = game.SwitchPlayer(currentGame)
 
-						nextGameScore := MinMax(firstMoveGame, depth-1, false, verbose)
+						nextGameScore := MinMax(ctx, firstMoveGame, depth-1, false, verbose, cancel)
 						if verbose {
 							for i := 0; i < 4-depth; i++ {
 								fmt.Print("\t")
@@ -190,7 +202,7 @@ func MinMax(inputGame game.Game, depth int, maximizingPlayer bool, verbose bool)
 					// nextGame = game.ReplacePucks(nextGame)
 					firstMoveGame = game.Tilt(firstMoveGame, &board, secondDirection)
 					firstMoveGame = game.SwitchPlayer(currentGame)
-					nextGameScore := MinMax(firstMoveGame, depth-1, true, verbose)
+					nextGameScore := MinMax(ctx, firstMoveGame, depth-1, true, verbose, cancel)
 
 					if verbose {
 						for i := 0; i < 4-depth; i++ {

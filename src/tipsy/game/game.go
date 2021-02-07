@@ -90,13 +90,36 @@ func Deserialize(gameString []string) Game {
 	return deserializedGame
 }
 
+func getFreeNeighborCell(positionKey string, game Game, board *Board) string {
+
+	position := tools.GetPositionFromKey(positionKey)
+	for _, direction := range Directions {
+		node := GetNeighbor(position, board, direction)
+		if (Node{}) != node {
+			nodePositionKey := tools.GetKeyFromPosition(node.Position)
+			_, isAlreadyTaken := game.Pucks[nodePositionKey]
+			if !isAlreadyTaken {
+				return nodePositionKey
+			}
+		}
+	}
+	panic("No Position availables")
+}
+
 //ReplacePucks replace fallen pucks
-func ReplacePucks(game Game) Game {
+func ReplacePucks(game Game, board *Board) Game {
 	resultGame := CloneGame(game)
 	for _, puck := range resultGame.FallenPucks {
 		puck.Flipped = true
-		resultGame.Pucks[puck.Position] = puck
+		_, alreadyTaken := resultGame.Pucks[puck.Position]
+		if !alreadyTaken {
+			resultGame.Pucks[puck.Position] = puck
+		} else {
+			freeNeighborCell := getFreeNeighborCell(puck.Position, game, board)
+			resultGame.Pucks[freeNeighborCell] = puck
+		}
 	}
+	resultGame.FallenPucks = nil
 	return resultGame
 }
 
