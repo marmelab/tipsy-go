@@ -4,4 +4,5 @@ package game
 type Puck struct {
 	Color    string `json:"color"`
 	Flipped  bool   `json:"flipped"`
+	Position string `json:"position"`
 }

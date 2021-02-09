@@ -1,7 +1,9 @@
 package ai
 
 import (
+	"context"
 	"fmt"
+	"sync"
 	"tipsy/game"
 )
 
@@ -30,6 +32,7 @@ var heatMap = map[string]int{
 	"4:0": threeHops, "4:1": fourHops, "4:3": fiveHops, "4:5": threeHops, "4:6": twoHops,
 	"5:0": threeHops, "5:2": threeHops, "5:3": fourHops, "5:4": fourHops, "5:6": oneHop,
 	"6:0": twoHops, "6:1": oneHop, "6:2": twoHops, "6:4": threeHops, "6:5": threeHops, "6:6": twoHops}
+var Counter = 0
 
 //GetScore return the winner of the game, or active if no winner yet
 func GetScore(currentGame game.Game, remainingTurns bool) int {
@@ -86,7 +89,8 @@ func getFallenPucks(currentGame game.Game) (int, int, bool) {
 	fallenRedPucks := 0
 	fallenBluePucks := 0
 	fallenBlackPuck := false
-	for _, puck := range currentGame.FallenPucks {
+	gameFallenPucks := currentGame.FallenPucks
+	for _, puck := range gameFallenPucks {
 		switch puck.Color {
 		case game.BLUE:
 			fallenBluePucks++
@@ -124,57 +128,104 @@ func getCurrentPlayerScore(winningPlayer string, askingPlayer string) int {
 }
 
 //MinMax evaluate best move giving a depth and a starting game
-func MinMax(inputGame game.Game, depth int, maximizingPlayer bool, verbose bool) int {
+func MinMax(ctx context.Context, inputGame game.Game, depth int, maximizingPlayer bool, verbose bool, cancel context.CancelFunc) int {
+	Counter++
 	currentGame := game.CloneGame(inputGame)
 	currentGameScore := GetScore(currentGame, false)
-	if depth == 0 || currentGameScore == WinningScore || currentGameScore == LosingScore {
+	if currentGameScore == WinningScore || currentGameScore == LosingScore {
+		cancel()
 		return currentGameScore
+	}
+	if depth == 0 {
+		return currentGameScore
+	}
+	select {
+	case <-ctx.Done():
+		return currentGameScore
+	default:
 	}
 	board := game.NewBoard()
 	if maximizingPlayer {
-		value := -9999999
+		bestScore := -9999999
+		var wg sync.WaitGroup
+		scoresChannel := make(chan int, 16)
 		for _, firstDirection := range game.Directions {
-			for _, secondDirection := range game.Directions {
-				// nextGame = game.ReplacePucks(nextGame)
-				nextGame := game.Tilt(currentGame, &board, firstDirection)
-				nextGame = game.Tilt(nextGame, &board, secondDirection)
-				nextGame = game.SwitchPlayer(currentGame)
+			firstMoveGame := game.ReplacePucks(currentGame, &board)
+			firstMoveGame = game.Tilt(currentGame, &board, firstDirection)
+			score := GetScore(firstMoveGame, true)
+			if score != WinningScore && score != LosingScore {
+				for _, secondDirection := range game.Directions {
+					wg.Add(1)
+					go func(secondDirection string, wg *sync.WaitGroup, scoresChannel chan<- int) {
+						defer wg.Done()
+						firstMoveGame = game.Tilt(firstMoveGame, &board, secondDirection)
+						firstMoveGame = game.SwitchPlayer(currentGame)
 
-				nextGameScore := MinMax(nextGame, depth-1, false, verbose)
-				if verbose {
-					for i := 0; i < 4-depth; i++ {
-						fmt.Print("\t")
-					}
-					fmt.Printf("Exploring %v %v => %v\n", firstDirection, secondDirection, nextGameScore)
+						nextGameScore := MinMax(ctx, firstMoveGame, depth-1, false, verbose, cancel)
+						if verbose {
+							for i := 0; i < 4-depth; i++ {
+								fmt.Print("\t")
+							}
+							fmt.Printf("Exploring %v %v => %v\n", firstDirection, secondDirection, nextGameScore)
+						}
+						scoresChannel <- nextGameScore
+					}(secondDirection, &wg, scoresChannel)
 				}
-				if nextGameScore > value {
-					value = nextGameScore
+			} else {
+				if score > bestScore {
+					bestScore = score
 				}
 			}
 		}
-		return value
+		wg.Wait()
+		close(scoresChannel)
+		for score := range scoresChannel {
+			if score > bestScore {
+				bestScore = score
+			}
+
+		}
+		return bestScore
 	}
 
-	value := 9999999
+	var wg sync.WaitGroup
+	scoresChannel := make(chan int, 16)
+	bestScore := 9999999
 	for _, firstDirection := range game.Directions {
-		for _, secondDirection := range game.Directions {
-			// nextGame = game.ReplacePucks(nextGame)
-			nextGame := game.Tilt(currentGame, &board, firstDirection)
-			nextGame = game.Tilt(nextGame, &board, secondDirection)
-			nextGame = game.SwitchPlayer(currentGame)
-			nextGameScore := MinMax(nextGame, depth-1, true, verbose)
+		firstMoveGame := game.Tilt(currentGame, &board, firstDirection)
+		score := GetScore(firstMoveGame, true)
+		if score != WinningScore && score != LosingScore {
+			for _, secondDirection := range game.Directions {
+				wg.Add(1)
+				go func(secondDirection string, wg *sync.WaitGroup, scoresChannel chan<- int) {
+					defer wg.Done()
+					// nextGame = game.ReplacePucks(nextGame)
+					firstMoveGame = game.Tilt(firstMoveGame, &board, secondDirection)
+					firstMoveGame = game.SwitchPlayer(currentGame)
+					nextGameScore := MinMax(ctx, firstMoveGame, depth-1, true, verbose, cancel)
 
-			if verbose {
-				for i := 0; i < 4-depth; i++ {
-					fmt.Print("\t")
-				}
-				fmt.Printf("Exploring %v %v => %v\n", firstDirection, secondDirection, nextGameScore)
+					if verbose {
+						for i := 0; i < 4-depth; i++ {
+							fmt.Print("\t")
+						}
+						fmt.Printf("Exploring %v %v => %v\n", firstDirection, secondDirection, nextGameScore)
+					}
+					scoresChannel <- nextGameScore
+				}(secondDirection, &wg, scoresChannel)
 			}
-			if nextGameScore < value {
-				value = nextGameScore
+		} else {
+			if score < bestScore {
+				bestScore = score
 			}
 		}
 	}
-	return value
+	wg.Wait()
+	close(scoresChannel)
+	for score := range scoresChannel {
+		if score < bestScore {
+			bestScore = score
+		}
+	}
+	return bestScore
 
 }

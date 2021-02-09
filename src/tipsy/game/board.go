@@ -90,7 +90,8 @@ func Contains(position [2]int, board *Board) bool {
 	return false
 }
 
-func getNeighbor(position [2]int, board *Board, direction string) Node {
+//Get Neighbor in given direction
+func GetNeighbor(position [2]int, board *Board, direction string) Node {
 	puckNode := getNode(position, board)
 	return getNodeTo(puckNode, board, direction)
 }
@@ -116,7 +117,7 @@ func isAWall(node Node, board *Board) bool {
 }
 
 func getNextFreeCell(position [2]int, gamePucks map[string]Puck, board *Board, direction string) [2]int {
-	neighbor := getNeighbor(position, board, direction)
+	neighbor := GetNeighbor(position, board, direction)
 	if isAPuck(neighbor, gamePucks) || isAWall(neighbor, board) {
 		return position
 	}
@@ -129,17 +130,17 @@ func isExit(position [2]int, board *Board) bool {
 }
 
 func movePuckTo(puckKey string, currentPuck Puck,
-	inputGamePucks map[string]Puck, board *Board, direction string) (map[string]Puck, []Puck) {
-	gamePucks := cloneMap(inputGamePucks)
-	neighbors := getNeighbor(tools.GetPositionFromKey(puckKey), board, direction)
+	inputGamePucks map[string]Puck, board *Board, direction string) (map[string]Puck, map[string]Puck) {
+	gamePucks := CloneMap(inputGamePucks)
+	neighbors := GetNeighbor(tools.GetPositionFromKey(puckKey), board, direction)
 	var nodesWithPuck []Node
 	for isAPuck(neighbors, gamePucks) {
 		nodesWithPuck = append(nodesWithPuck, neighbors)
-		neighbors = getNeighbor(neighbors.Position, board, direction)
+		neighbors = GetNeighbor(neighbors.Position, board, direction)
 	}
 
 	pucks := make(map[string]Puck)
-	var fallenPucks []Puck
+	fallenPucks := make(map[string]Puck)
 	for i := len(nodesWithPuck) - 1; i >= 0; i-- {
 		nodeWithPuck := nodesWithPuck[i]
 		nextFreeCell := getNextFreeCell(nodeWithPuck.Position, gamePucks, board, direction)
@@ -147,7 +148,7 @@ func movePuckTo(puckKey string, currentPuck Puck,
 		nextFreeCellKey := tools.GetKeyFromPosition(nextFreeCell)
 		if nextFreeCell != nodeWithPuck.Position {
 			if isExit(nextFreeCell, board) {
-				fallenPucks = append(fallenPucks, puck)
+				fallenPucks[tools.GetKeyFromPosition(nodeWithPuck.Position)] = puck
 			} else {
 				pucks[nextFreeCellKey] = puck
 				gamePucks[nextFreeCellKey] = puck
@@ -157,7 +158,7 @@ func movePuckTo(puckKey string, currentPuck Puck,
 	}
 	nextFreeCell := getNextFreeCell(tools.GetPositionFromKey(puckKey), gamePucks, board, direction)
 	if isExit(nextFreeCell, board) {
-		fallenPucks = append(fallenPucks, currentPuck)
+		fallenPucks[puckKey] = currentPuck
 	} else {
 		pucks[tools.GetKeyFromPosition(nextFreeCell)] = currentPuck
 	}
@@ -169,20 +170,26 @@ func movePuckTo(puckKey string, currentPuck Puck,
 func Tilt(currentGame Game, board *Board, direction string) Game {
 	gamePucks := make(map[string]Puck)
 	resultGame := CloneGame(currentGame)
-	var gameFallenPucks []Puck
+	gameFallenPucks := make(map[string]Puck)
 	for key, puck := range resultGame.Pucks {
 		movedPucks, fallenPucks := movePuckTo(key, puck, resultGame.Pucks, board, direction)
 		for key, puck := range movedPucks {
 			gamePucks[key] = puck
 		}
-		gameFallenPucks = append(gameFallenPucks, fallenPucks...)
+		for key, puck := range fallenPucks {
+			puck.Position = key
+			resultGame.FallenPucks = append(resultGame.FallenPucks, puck)
+		}
 	}
 	resultGame.Pucks = gamePucks
-	resultGame.FallenPucks = append(resultGame.FallenPucks, gameFallenPucks...)
+	for key, puck := range gameFallenPucks {
+		puck.Position = key
+		resultGame.FallenPucks = append(resultGame.FallenPucks, puck)
+	}
 	return resultGame
 }
 
-func cloneMap(original map[string]Puck) map[string]Puck {
+func CloneMap(original map[string]Puck) map[string]Puck {
 	target := make(map[string]Puck)
 	for key, value := range original {
 		target[key] = value

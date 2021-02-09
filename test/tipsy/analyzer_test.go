@@ -26,7 +26,7 @@ func TestMoveToEastShouldBePartOfTheWinsWhenLastBlueNearExit(t *testing.T) {
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	_, moves := ai.GetNextMovesScores(currentGame, 2, true)
+	_, moves := ai.GetNextMovesScores(currentGame, 3, true)
 
 	//THEN
 	rightLeftWin := moves["right:left"]
@@ -64,7 +64,7 @@ func TestMoveToEastShouldBePartOfTheLoseWhenLastBlueNearExit(t *testing.T) {
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	_, moves := ai.GetNextMovesScores(currentGame, 2, true)
+	_, moves := ai.GetNextMovesScores(currentGame, 3, true)
 
 	//THEN
 	rightLeftWin := moves["right:left"]
@@ -102,7 +102,7 @@ func TestMoveToUpRightShouldBePartOfTheWinsWhenLastBlueIsOneCellNearExit(t *test
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	_, moves := ai.GetNextMovesScores(game, 2, true)
+	_, moves := ai.GetNextMovesScores(game, 3, true)
 
 	//THEN
 	upRightWin := moves["up:right"]
@@ -127,7 +127,7 @@ func TestBestMoveShouldBeToMoveBlackFarOfTheExit(t *testing.T) {
 	game := game.Deserialize(rawGame)
 
 	//WHEN
-	bestMove, moves := ai.GetNextMovesScores(game, 2, true)
+	bestMove, moves := ai.GetNextMovesScores(game, 3, true)
 
 	//THEN
 	if bestMove != "left:down" {
@@ -152,7 +152,7 @@ func TestMoveToDownRightShouldBeTheBestMove(t *testing.T) {
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	bestMove, bestMoves := ai.GetNextMovesScores(currentGame, 1, true)
+	bestMove, bestMoves := ai.GetNextMovesScores(currentGame, 3, true)
 
 	//THEN
 
@@ -184,7 +184,7 @@ func TestMoveToDownShouldBeALosingMoveAsItExitRedPuck(t *testing.T) {
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	_, bestMoves := ai.GetNextMovesScores(currentGame, 2, true)
+	_, bestMoves := ai.GetNextMovesScores(currentGame, 3, true)
 
 	//THEN
 
@@ -224,7 +224,7 @@ func TestMoveToDownRightShouldBeTheBestMoveAsItPushOutLastBluePucks(t *testing.T
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	bestMove, bestMoves := ai.GetNextMovesScores(currentGame, 1, true)
+	bestMove, bestMoves := ai.GetNextMovesScores(currentGame, 3, true)
 
 	//THEN
 
@@ -255,7 +255,7 @@ func TestMoveToDownRightShouldBeTheBestMoveAsItPushOutTheBlackPuck(t *testing.T)
 	currentGame := game.Deserialize(rawGame)
 
 	//WHEN
-	bestMove, bestMoves := ai.GetNextMovesScores(currentGame, 1, true)
+	bestMove, bestMoves := ai.GetNextMovesScores(currentGame, 3, true)
 
 	//THEN
 

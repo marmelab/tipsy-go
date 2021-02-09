@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	minMaxDepth = 3
+	minMaxDepth = 4
 )
 
 func main() {
@@ -41,5 +41,6 @@ func main() {
 	}
 	fmt.Println()
 	fmt.Printf("Found in %v\n\n", elapsed)
+	fmt.Printf("Tryed %v moves\n\n", ai.Counter)
 	fmt.Printf("Best Move : %v", bestMove)
 }
