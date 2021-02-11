@@ -2,45 +2,28 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"time"
+	"log"
+	"net/http"
 	"tipsy/ai"
 	"tipsy/game"
 )
 
 const (
-	minMaxDepth = 4
+	minMaxDepth = 3
 )
-
-func main() {
-	inputFilePath := flag.String("file",
-		"./test/tipsy/dataset/active.json",
-		"File with the board state, default is the starting board")
-	verbose := flag.Bool("v", false, "Verbose output")
-	flag.Parse()
-	file, err := os.Open(*inputFilePath)
+func getNextMove(rw http.ResponseWriter, req *http.Request) {
+    req.ParseForm()
+    var currentGame game.Game
+	err := json.NewDecoder(req.Body).Decode(&currentGame)
 	if err != nil {
-		panic(err)
-	}
-	byteValue, _ := ioutil.ReadAll(file)
-
-	var rawGame []string
-
-	json.Unmarshal(byteValue, &rawGame)
-
-	currentGame := game.Deserialize(rawGame)
-
-	start := time.Now()
-	bestMove, movesScore := ai.GetNextMovesScores(currentGame, minMaxDepth, *verbose)
-	elapsed := time.Since(start)
-	for move, moveScore := range movesScore {
-		fmt.Printf("- %v => %v\n", move, moveScore)
-	}
-	fmt.Println()
-	fmt.Printf("Found in %v\n\n", elapsed)
-	fmt.Printf("Tryed %v moves\n\n", ai.Counter)
-	fmt.Printf("Best Move : %v", bestMove)
+        http.Error(rw, err.Error(), http.StatusBadRequest)
+        return
+    }
+	bestMove, _ := ai.GetNextMovesScores(currentGame, minMaxDepth, false)
+    fmt.Fprintf(rw, "currentPlayer:"+bestMove)
+}
+func main() {
+	http.HandleFunc("/", getNextMove)
+    log.Fatal(http.ListenAndServe(":8082", nil))
 }
