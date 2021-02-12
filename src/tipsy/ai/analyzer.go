@@ -46,12 +46,10 @@ func GetNextMovesScores(currentGame game.Game, depth int, verbose bool) (string,
 						secondMoveGame game.Game, wg *sync.WaitGroup,
 						ctx context.Context, cancel context.CancelFunc) {
 						defer wg.Done()
-						fmt.Printf("exploring %v\n", firstDirection+":"+secondDirection)
 						maxMoveScore := MinMax(ctx, secondMoveGame, depth, false, false, cancel)
 						movesChannel <- MovementScore{
 							movement: firstDirection + ":" + secondDirection,
 							score:    maxMoveScore}
-						fmt.Println(firstDirection + ":" + secondDirection + " explored")
 					}(movesChannel, firstDirection, secondDirection, secondMoveGame, &wg, ctx, cancel)
 				}
 			}
